@@ -1,0 +1,16 @@
+
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>example.serialisation.all</id>
+    <version>$version$</version>
+    <description>Example.Serialisation</description>
+    <authors>Adam Shergold</authors>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="11.0.2"/>
+      <dependency id="Microsoft.Extensions.Logging" version="2.1.1"/>
+    </dependencies>  
+  </metadata>
+  <files>
+    <file src="bin\Debug\**\example.serialisation*.dll" target="lib" />
+  </files>
+</package>

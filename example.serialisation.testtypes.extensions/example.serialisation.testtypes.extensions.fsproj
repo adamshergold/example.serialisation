@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../etc/common.props"/>
+  
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="extensions.fs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="$(Example-FSharp-Core-Version)" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\example.serialisation.testtypes\example.serialisation.testtypes.fsproj" />
+  </ItemGroup>
+
+</Project>

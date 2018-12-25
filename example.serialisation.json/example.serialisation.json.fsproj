@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../etc/common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="peekreader.fs" />
+    <Compile Include="propertyhandler.fs" />
+    <Compile Include="jsonPeekReaderStreamWrapper.fs" />
+    <Compile Include="jsonTextWriterStreamWrapper.fs" />
+    <Compile Include="serialiser.fs" />
+    <Compile Include="deserialiser.fs" />
+    <Compile Include="jsonProxy.fs" />
+    <Compile Include="any.fs" />
+    <Compile Include="helpers.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="$(Example-GitVersionTask-Version)">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="FSharp.Core" Version="$(Example-FSharp-Core-Version)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(Example-Microsoft-Extensions-Logging-Version)" />
+    <PackageReference Include="Newtonsoft.Json" Version="$(Example-Newtonsoft-Json-Version)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\example.serialisation\example.serialisation.fsproj" />
+  </ItemGroup>
+
+</Project>

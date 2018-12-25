@@ -1,0 +1,6 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpAutoNaming/IsNamingAutoDetectionCompleted/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpAutoNaming/IsNotificationDisabled/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=057ed105_002D61c4_002D42c5_002Da018_002D9874c21273ae_0023example_002Eserialisation_002Etests/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=9aaa3b67_002Db1f9_002D4d0e_002Dad3e_002Db1b0e4201fd6_0023example_002Eserialisation_002Etypes/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=e3a6d692_002D4c98_002D4789_002Dbfaa_002D601cace18f40_0023example_002Eserialisation_002Ejson/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

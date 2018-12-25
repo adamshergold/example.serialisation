@@ -1,0 +1,22 @@
+image: microsoft/dotnet:2.2-sdk 
+stages:
+  - build
+  - test
+
+before_script:
+  - apt-get update
+  - apt-get install -y libgit2-dev 
+  - ln -s /usr/lib/x86_64-linux-gnu/libgit2.so /lib/x86_64-linux-gnu/libgit2-15e1193.so
+  - curl -s https://codecov.io/bash > codecov
+  - chmod +x codecov
+
+build:
+  stage: build
+  script:
+    - dotnet build example.serialisation.sln
+
+test:
+  stage: test
+  script:
+    - dotnet test example.serialisation.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.tests/coverage.opencover.xml -t $CODECOV_TOKEN

@@ -2,6 +2,7 @@ image: microsoft/dotnet:2.2-sdk
 stages:
   - build
   - test
+  - publish
 
 before_script:
   - apt-get update
@@ -20,3 +21,9 @@ test:
   script:
     - dotnet test example.serialisation.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     - ./codecov -f example.serialisation.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+
+publish:
+  stage: publish
+  script:    
+    - dotnet pack example.serialisation -o /tmp/nupkgs
+    - dotnet nuget push /tmp/nupkgs/* -k $MYGET_APIKEY -s $MYGET_URL

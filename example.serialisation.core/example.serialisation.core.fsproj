@@ -7,15 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="peekreader.fs" />
-    <Compile Include="propertyhandler.fs" />
-    <Compile Include="jsonPeekReaderStreamWrapper.fs" />
-    <Compile Include="jsonTextWriterStreamWrapper.fs" />
-    <Compile Include="serialiser.fs" />
-    <Compile Include="deserialiser.fs" />
-    <Compile Include="jsonProxy.fs" />
-    <Compile Include="any.fs" />
+    
+    <Compile Include="interfaces.fs" />
+    <Compile Include="binaryPeekStreamWrapper.fs" />
+    <Compile Include="typeWrapper.fs" />
+    <Compile Include="serde.fs" />
+    <Compile Include="serialiserStreamWrapper.fs" />
     <Compile Include="helpers.fs" />
+    <Compile Include="binaryProxy.fs" />
+    <Compile Include="binarySerialiser.fs" />    
+    <Compile Include="binaryDeserialiser.fs" />
+    
   </ItemGroup>
 
   <ItemGroup>
@@ -25,11 +27,7 @@
     </PackageReference>
     <PackageReference Include="FSharp.Core" Version="$(Example-FSharp-Core-Version)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(Example-Microsoft-Extensions-Logging-Version)" />
-    <PackageReference Include="Newtonsoft.Json" Version="$(Example-Newtonsoft-Json-Version)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\example.serialisation.core\example.serialisation.core.fsproj" />
-  </ItemGroup>
-
+ 
 </Project>

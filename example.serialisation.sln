@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "example.serialisation", "example.serialisation\example.serialisation.fsproj", "{178BF85A-F953-4570-9D36-A9AA78B2784F}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "example.serialisation.tests", "example.serialisation.tests\example.serialisation.tests.fsproj", "{057ED105-61C4-42C5-A018-9874C21273AE}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "example.serialisation.json", "example.serialisation.json\example.serialisation.json.fsproj", "{E3A6D692-4C98-4789-BFAA-601CACE18F40}"
@@ -12,6 +10,8 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "example.serialisation.testtypes", "example.serialisation.testtypes\example.serialisation.testtypes.fsproj", "{182CBE60-A025-4BCF-94B0-0FDA757E5939}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "example.serialisation.testtypes.extensions", "example.serialisation.testtypes.extensions\example.serialisation.testtypes.extensions.fsproj", "{0DC11E5D-DA19-4308-97E0-D54BFAC60067}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "example.serialisation.core", "example.serialisation.core\example.serialisation.core.fsproj", "{8ED34BAB-AE60-4188-8A2F-55C229F58241}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,18 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Debug|x64.Build.0 = Debug|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Debug|x86.Build.0 = Debug|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Release|x64.ActiveCfg = Release|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Release|x64.Build.0 = Release|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Release|x86.ActiveCfg = Release|Any CPU
-		{178BF85A-F953-4570-9D36-A9AA78B2784F}.Release|x86.Build.0 = Release|Any CPU
 		{057ED105-61C4-42C5-A018-9874C21273AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{057ED105-61C4-42C5-A018-9874C21273AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{057ED105-61C4-42C5-A018-9874C21273AE}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -86,5 +74,17 @@ Global
 		{0DC11E5D-DA19-4308-97E0-D54BFAC60067}.Release|x64.Build.0 = Release|Any CPU
 		{0DC11E5D-DA19-4308-97E0-D54BFAC60067}.Release|x86.ActiveCfg = Release|Any CPU
 		{0DC11E5D-DA19-4308-97E0-D54BFAC60067}.Release|x86.Build.0 = Release|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Debug|x64.Build.0 = Debug|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Debug|x86.Build.0 = Debug|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Release|x64.ActiveCfg = Release|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Release|x64.Build.0 = Release|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Release|x86.ActiveCfg = Release|Any CPU
+		{8ED34BAB-AE60-4188-8A2F-55C229F58241}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

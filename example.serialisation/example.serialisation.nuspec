@@ -1,13 +1,13 @@
 
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
-    <id>example.serialisation.all</id>
+    <id>example.serialisation</id>
     <version>$version$</version>
     <description>Example.Serialisation</description>
     <authors>Adam Shergold</authors>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="11.0.2"/>
-      <dependency id="Microsoft.Extensions.Logging" version="2.1.1"/>
+      <dependency id="Newtonsoft.Json" version="12.0.1"/>
+      <dependency id="Microsoft.Extensions.Logging" version="2.2.0"/>
     </dependencies>  
   </metadata>
   <files>

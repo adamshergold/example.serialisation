@@ -45,7 +45,7 @@
   <ItemGroup>
     <ProjectReference Include="..\example.serialisation.testtypes.extensions\example.serialisation.testtypes.extensions.fsproj" />
     <ProjectReference Include="..\example.serialisation.testtypes\example.serialisation.testtypes.fsproj" />
-    <ProjectReference Include="..\example.serialisation\example.serialisation.fsproj" />
+    <ProjectReference Include="..\example.serialisation.core\example.serialisation.core.fsproj" />
   </ItemGroup>
 
 </Project>

@@ -14,7 +14,7 @@
     <Compile Include="serialiser.fs" />
     <Compile Include="deserialiser.fs" />
     <Compile Include="jsonProxy.fs" />
-    <Compile Include="any.fs" />
+    <Compile Include="anySerialiser.fs" />
     <Compile Include="helpers.fs" />
   </ItemGroup>
 

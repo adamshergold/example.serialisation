@@ -1,7 +1,6 @@
 namespace Example.Serialisation.Json
 
-open Example.Serialisation 
-
+open Example.Serialisation
 open System
 open Newtonsoft.Json 
 

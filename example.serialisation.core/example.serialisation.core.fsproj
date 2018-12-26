@@ -15,8 +15,10 @@
     <Compile Include="serialiserStreamWrapper.fs" />
     <Compile Include="helpers.fs" />
     <Compile Include="binaryProxy.fs" />
+    <Compile Include="any.fs" />
     <Compile Include="binarySerialiser.fs" />    
     <Compile Include="binaryDeserialiser.fs" />
+    <Compile Include="anySerialiser.fs" />
     
   </ItemGroup>
 

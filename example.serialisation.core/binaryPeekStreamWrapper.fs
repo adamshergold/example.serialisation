@@ -29,13 +29,16 @@ type BinaryPeekStreamWrapper( ss: ISerdeStream ) =
             else 
                 reader.ReadString() )
           
+    member this.ReadInt8 () =
+        reader.ReadByte()
+            
     member this.ReadInt32 () = 
         reader.ReadInt32() 
 
     member this.ReadInt64 () = 
         reader.ReadInt64() 
             
-    member this.ReadBoolean () =    
+    member this.ReadBool () =    
         reader.ReadBoolean() 
         
     member this.ReadDouble () = 

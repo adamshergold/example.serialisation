@@ -1,10 +1,9 @@
 namespace Example.Serialisation.Tests
 
-open Xunit
-open Xunit.Abstractions
-
 open Example.Serialisation
 
+open Xunit
+open Xunit.Abstractions
 
 type BinarySerialiserShould( oh: ITestOutputHelper ) =
     

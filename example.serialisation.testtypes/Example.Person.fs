@@ -80,10 +80,8 @@ module private Person_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, Some this.ContentType )
+                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
 
-                    bds.Start( this.TypeName )
-                    
                     let name = 
                         bds.ReadString()
                         
@@ -91,7 +89,7 @@ module private Person_Serialisers =
                         bds.ReadRecord<_>()
                         
                     let phone = 
-                        if bds.ReadBoolean() then 
+                        if bds.ReadBool() then 
                             Some( bds.ReadRecord<Example.Serialisation.TestTypes.Example.Phone>() ) 
                         else 
                             None 
@@ -100,7 +98,7 @@ module private Person_Serialisers =
                         bds.ReadMap<Example.Serialisation.TestTypes.Example.Score>( fun () -> bds.ReadRecord<_>() )
                         
                     let pets =
-                        if bds.ReadBoolean() then  
+                        if bds.ReadBool() then  
                             let v = bds.ReadArray<Example.Serialisation.TestTypes.Example.IPet>( fun () -> bds.ReadInterface<_>() )
                             Some v 
                         else

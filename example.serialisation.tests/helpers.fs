@@ -4,7 +4,7 @@ open Example.Serialisation
 
 module Helpers = 
     
-    let Serde () =
+    let Serialiser () =
     
         let options =   
             SerdeOptions.Default
@@ -15,5 +15,5 @@ module Helpers =
         serialiser                 
         
     let DefaultSerialiser = 
-        Serde() 
+        Serialiser() 
                 

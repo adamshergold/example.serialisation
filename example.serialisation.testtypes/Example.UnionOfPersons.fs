@@ -42,9 +42,7 @@ module private UnionOfPersons_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, Some this.ContentType )
-
-                    bds.Start( this.TypeName )
+                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
                     
                     match bds.ReadString() with
                     | _ as v when v = "Nobody" ->

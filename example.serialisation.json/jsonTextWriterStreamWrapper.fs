@@ -1,7 +1,6 @@
 namespace Example.Serialisation.Json
 
-open Example.Serialisation 
-
+open Example.Serialisation
 open Newtonsoft.Json 
 
 type JsonTextWriterStreamWrapper( ss: ISerdeStream, writer: JsonTextWriter, owner: bool ) = 

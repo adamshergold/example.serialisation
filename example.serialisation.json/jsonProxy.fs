@@ -81,12 +81,10 @@ with
                     member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
                     
                         use bds = 
-                            BinaryDeserialiser.Make( serialiser, stream, Some this.ContentType )
+                            BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
                             
-                        bds.Start( this.TypeName ) 
-                                                   
                         let contentType =
-                            if bds.ReadBoolean() then Some( bds.ReadString() ) else None 
+                            if bds.ReadBool() then Some( bds.ReadString() ) else None 
                             
                         let typeName = 
                             bds.ReadString() 

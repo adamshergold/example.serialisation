@@ -1,11 +1,9 @@
 namespace Example.Serialisation.Json
 
-open Example.Serialisation 
+open Newtonsoft.Json
 
-open System
-open Newtonsoft.Json 
-
-            
+open Example.Serialisation
+             
 type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : string option, typeName: string ) = 
 
     let handlers = 
@@ -49,9 +47,6 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
         with 
         | _ as ex ->
             failwithf "Failed to parse '%s' as enum of type '%O'" strV (typeof<'T>)
-
-    member this.ReadDateTime () =
-        DateTime.Parse( reader.Read().Value.ToString() ) :> obj 
 
     member this.ReadNull () = 
         reader.ReadToken JsonToken.Null

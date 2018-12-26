@@ -49,10 +49,8 @@ module private Address_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, Some this.ContentType )
+                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
 
-                    bds.Start( this.TypeName )
-                    
                     let _Number = 
                         bds.ReadInt32()
 

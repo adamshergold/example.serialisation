@@ -1,6 +1,6 @@
 namespace Example.Serialisation.TestTypes
 
-open Example.Serialisation.Json 
+open Example.Serialisation
 
 open Example.Serialisation.TestTypes.Example 
 

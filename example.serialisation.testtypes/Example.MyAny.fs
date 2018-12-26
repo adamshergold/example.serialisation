@@ -19,6 +19,43 @@ with
 
 module private MyAny_Serialisers = 
 
+    let Binary_Serialiser = 
+        { new ITypeSerialiser<MyAny>
+            with
+                member this.TypeName =
+                    "Example.MyAny"
+
+                member this.Type
+                    with get () = typeof<MyAny>
+
+                member this.ContentType
+                    with get () = "binary"
+
+                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+
+                    use bs = 
+                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                    
+                    bs.Write( (int32) v.BitsAndBobs.Count )
+                    v.BitsAndBobs
+                    |> Map.iter ( fun k v ->
+                        bs.Write( k ) 
+                        bs.Write( v ) )                                          
+
+                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+
+                    use bds =
+                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+
+                    let _BitsAndBobs =
+                        bds.ReadMap<Example.Serialisation.Any>( bds.ReadAny )
+                    
+                    let result = {
+                        BitsAndBobs = _BitsAndBobs
+                        }
+                    
+                    result }
+        
     let JSON_Serialiser = 
         { new ITypeSerialiser<MyAny>
             with
@@ -69,4 +106,6 @@ module private MyAny_Serialisers =
 
 type MyAny with
 
+    static member Binary_Serialiser = MyAny_Serialisers.Binary_Serialiser
+    
     static member JSON_Serialiser = MyAny_Serialisers.JSON_Serialiser

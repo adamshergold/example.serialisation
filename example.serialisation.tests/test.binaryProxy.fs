@@ -5,9 +5,7 @@ open Microsoft.Extensions.Logging
 open Xunit
 open Xunit.Abstractions 
 
-
-open Example.Serialisation
- 
+open System.IO
 
 //type BinaryProxyShould( oh: ITestOutputHelper ) = 
 //

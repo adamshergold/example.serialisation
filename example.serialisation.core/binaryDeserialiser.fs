@@ -2,29 +2,32 @@ namespace Example.Serialisation
 
 open Microsoft.Extensions.Logging 
 
-type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, contentType : string option ) = 
+type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) = 
 
     let wrapper = 
         BinaryPeekStreamWrapper.Make( ss ) 
         
-    member val ContentType = contentType
-        
-    static member Make( serialiser, ss, contentType ) = 
-        new BinaryDeserialiser( serialiser, ss, contentType )
-
-    member this.Start (expectedTypeName:string) =
-
-        let typeName = 
+    do 
+        let inlineTypeName = 
             wrapper.ReadString()
     
         let nBytes = 
             wrapper.ReadInt32() 
           
-        if expectedTypeName <> typeName then 
-            failwithf "Attempting to deserialise '%s' but saw '%s'" expectedTypeName typeName 
+        if inlineTypeName <> typeName then 
+            failwithf "Attempting to deserialise '%s' but saw '%s'" inlineTypeName typeName 
+ 
+                
+    member val TypeName = typeName 
+            
+    member val ContentType = Some "binary"
+        
+    static member Make( serialiser, ss, typeName ) = 
+        new BinaryDeserialiser( serialiser, ss, typeName )
 
-        ()                                      
-    
+    member this.ReadInt8 () =
+        wrapper.ReadInt8()
+        
     member this.ReadString () = 
         wrapper.ReadString()
         
@@ -37,15 +40,23 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, contentType : str
     member this.ReadDateTime () = 
         System.DateTime.FromBinary( wrapper.ReadInt64() ) 
                 
-    member this.ReadBoolean () = 
-        wrapper.ReadBoolean() 
+    member this.ReadBool () = 
+        wrapper.ReadBool() 
                         
     member this.ReadDouble () = 
         wrapper.ReadDouble() 
            
     member this.ReadBytes (n:int32) = 
         wrapper.ReadBytes( n ) 
-                   
+
+    member this.ReadAny() =
+        match serialiser.Deserialise this.ContentType "Any" (wrapper :> ISerdeStream) with
+        | :? Any as av -> av
+        | _ as v -> failwithf "Unable to binary serialise Any - saw '%O'" (v.GetType())
+        
+    member this.ReadNull () = 
+        ()
+                           
     member this.ReadEnum<'T> () =
         let strV = wrapper.ReadString()
         try  

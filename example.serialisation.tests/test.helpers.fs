@@ -47,7 +47,7 @@ type HelpersShould( oh: ITestOutputHelper ) =
 //        use wrapper =
 //            SerialiserStreamWrapper.Make( new System.IO.MemoryStream( bytes ) )
 //              
-//        let rt = serialiser.DeserialiseT<Example.Serialisation.TestTypes.Example.Person> (Some "json") wrapper
+//        let rt = serialiser.DeserialiseT<Klarity.Serialisation.TestTypes.Example.Person> (Some "json") wrapper
 //        
 //        Assert.True( true )       
         

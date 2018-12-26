@@ -2,6 +2,7 @@ namespace Example.Serialisation.Json
 
 open Newtonsoft.Json 
 
+
 type ReaderItem = 
     {
         Token : JsonToken

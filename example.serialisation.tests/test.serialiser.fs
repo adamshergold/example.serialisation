@@ -50,7 +50,9 @@ type SerialiserShould( oh: ITestOutputHelper ) =
             Serde.Make( options ) 
             
         sut.TryRegisterAssembly (typeof<Example.Serialisation.BinaryProxy>.Assembly) |> ignore            
-        sut.TryRegisterAssembly (typeof<Example.Serialisation.TestTypes.Example.Person>.Assembly) |> ignore 
+        sut.TryRegisterAssembly (typeof<Example.Serialisation.TestTypes.Example.Person>.Assembly) |> ignore
+        sut.TryRegister Example.Serialisation.Json.Serialisers.AnyJsonSerialiser |> ignore
+        sut.TryRegister Example.Serialisation.Serialisers.AnyBinarySerialiser |> ignore
     
         fun () -> sut 
             
@@ -93,6 +95,11 @@ type SerialiserShould( oh: ITestOutputHelper ) =
                 |> Seq.map ( fun v ->
                     [| box(ct); box("Example.UnionOfPersons"); box(v) |] )
 
+            let myAnys (ct:string) = 
+                Example.Serialisation.TestTypes.Extensions.MyAny.Examples
+                |> Seq.map ( fun v ->
+                    [| box(ct); box("Example.MyAny"); box(v) |] )
+
             seq {
                 yield! (addresses "json")
                 yield! (addresses "binary")
@@ -115,6 +122,8 @@ type SerialiserShould( oh: ITestOutputHelper ) =
                 yield! (unionOfPersons "json")
                 yield! (unionOfPersons "binary")
 
+                yield! (myAnys "json")
+                yield! (myAnys "binary")
             }
                              
     [<Fact>]

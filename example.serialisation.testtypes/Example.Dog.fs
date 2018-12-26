@@ -56,15 +56,13 @@ module private Dog_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, Some this.ContentType )
+                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
 
-                    bds.Start( this.TypeName )
-                    
                     let _Name = 
                         bds.ReadString()
                         
                     let _NickName =
-                        if bds.ReadBoolean() then 
+                        if bds.ReadBool() then 
                             Some( bds.ReadString() ) 
                         else 
                             None

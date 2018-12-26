@@ -1,9 +1,7 @@
 namespace Example.Serialisation.Json
 
-open Example.Serialisation 
-
+open Example.Serialisation
 open Newtonsoft.Json 
-
 
 type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string option ) = 
 

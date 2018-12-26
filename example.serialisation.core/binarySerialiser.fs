@@ -20,6 +20,7 @@ type BinarySerialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) 
     member this.Write (v:obj) = 
         match v with 
         | :? string as v -> bw.Write(v)
+        | :? int8 as v -> bw.Write(v)
         | :? int32 as v -> bw.Write(v)
         | :? int64 as v -> bw.Write(v)
         | :? bool as v -> bw.Write(v)
@@ -45,4 +46,3 @@ type BinarySerialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) 
         with 
             member this.Dispose () = 
                 this.Dispose()
-                

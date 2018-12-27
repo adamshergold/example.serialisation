@@ -19,8 +19,12 @@ build:
 test:
   stage: test
   script:
-    - dotnet test example.serialisation.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-    - ./codecov -f example.serialisation.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+    - dotnet test example.serialisation.core.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.core.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+    - dotnet test example.serialisation.json.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.json.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+    - dotnet test example.serialisation.binary.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.binary.tests/coverage.opencover.xml -t $CODECOV_TOKEN
 
 publish:
   stage: publish

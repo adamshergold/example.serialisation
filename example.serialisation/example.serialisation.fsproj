@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\example.serialisation.core\example.serialisation.core.fsproj" />
     <ProjectReference Include="..\example.serialisation.json\example.serialisation.json.fsproj" />
+    <ProjectReference Include="..\example.serialisation.binary\example.serialisation.binary.fsproj" />
   </ItemGroup>
   
   <Target Name="UpdateNuspecProperties" AfterTargets="Build">

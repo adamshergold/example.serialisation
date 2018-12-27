@@ -27,6 +27,6 @@ type BinarySerialiserShould( oh: ITestOutputHelper ) =
             let serde =
                 Serde.Make()
                 
-            BinaryDeserialiser.Make( serde, serdeStream, "test" )
+            BinarySerialiser.Make( serde, serdeStream, "test" )
             
-        Assert.Equal( "test", sut.TypeName )
+        Assert.True( true )

@@ -1,4 +1,4 @@
-﻿namespace Example.Serialisation.Tests
+﻿namespace Example.Serialisation.Core.Tests
 
 open Xunit
 open Xunit.Abstractions

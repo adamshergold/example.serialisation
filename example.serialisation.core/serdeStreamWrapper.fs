@@ -1,11 +1,11 @@
 namespace Example.Serialisation
 
-type SerialiserStreamWrapper( s: System.IO.Stream ) = 
+type SerdeStreamWrapper( s: System.IO.Stream ) = 
 
     member val Stream = s
     
     static member Make( s ) = 
-        new SerialiserStreamWrapper( s ) :> ISerdeStream
+        new SerdeStreamWrapper( s ) :> ISerdeStream
     
     member this.Dispose () = 
         () 

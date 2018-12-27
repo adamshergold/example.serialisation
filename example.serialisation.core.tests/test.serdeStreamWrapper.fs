@@ -1,4 +1,4 @@
-namespace Example.Serialisation.Tests
+namespace Example.Serialisation.Core.Tests
 
 open Microsoft.Extensions.Logging 
 
@@ -8,7 +8,7 @@ open Xunit.Abstractions
 open Example.Serialisation
 open Example.Serialisation.TestTypes 
 
-type PeekStreamWrapperShould( oh: ITestOutputHelper ) = 
+type SerdeStreamWrapperShould( oh: ITestOutputHelper ) = 
 
     let logger =
     
@@ -16,22 +16,16 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
             { Logging.Options.Default with OutputHelper = Some oh }
             
         Logging.CreateLogger options
-
-    let sut () =
-       
-        let ms = 
-            new System.IO.MemoryStream() 
-            
-        let ss = 
-            SerialiserStreamWrapper.Make( ms )
-        
-        BinaryPeekStreamWrapper.Make( ss ) 
         
     [<Fact>]
     member this.``BeCreateable`` () = 
     
-        let sut = sut()
-                    
+        use ms = 
+            new System.IO.MemoryStream() 
+            
+        let sut = 
+            SerdeStreamWrapper.Make( ms ) 
+            
         Assert.True( true )                    
 
         

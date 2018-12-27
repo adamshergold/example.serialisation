@@ -3,6 +3,7 @@ namespace Example.Serialisation.Json
 open Newtonsoft.Json
 
 open Example.Serialisation
+open Example.Serialisation.Binary
 
 
 [<AutoOpen>]

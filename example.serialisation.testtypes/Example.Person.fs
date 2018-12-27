@@ -1,6 +1,7 @@
 namespace Example.Serialisation.TestTypes.Example
 
 open Example.Serialisation
+open Example.Serialisation.Binary
 open Example.Serialisation.Json
 
 type Person = {

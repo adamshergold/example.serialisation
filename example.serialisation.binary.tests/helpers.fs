@@ -1,4 +1,4 @@
-namespace Example.Serialisation.Tests 
+namespace Example.Serialisation.Binary.Tests 
 
 open Example.Serialisation 
 

@@ -1,4 +1,6 @@
-namespace Example.Serialisation
+namespace Example.Serialisation.Binary
+
+open Example.Serialisation
 
 module Serialisers =
     

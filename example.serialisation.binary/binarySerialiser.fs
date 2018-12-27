@@ -1,6 +1,8 @@
-namespace Example.Serialisation
+namespace Example.Serialisation.Binary
 
-open Microsoft.Extensions.Logging 
+open Microsoft.Extensions.Logging
+
+open Example.Serialisation
 
 type BinarySerialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) = 
 
@@ -8,11 +10,9 @@ type BinarySerialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) 
         new System.IO.MemoryStream()
 
     let streamWrapper = 
-        SerialiserStreamWrapper.Make( ms ) 
+        SerdeStreamWrapper.Make( ms ) 
         
     let bw = Serde.BinaryWriter( ms )
-    
-    //member val ContentType = contentType 
     
     static member Make( serialiser, ss, typeName ) = 
         new BinarySerialiser( serialiser, ss, typeName ) 

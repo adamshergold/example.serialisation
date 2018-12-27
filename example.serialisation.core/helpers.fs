@@ -8,7 +8,7 @@ module Helpers =
             new System.IO.MemoryStream()
             
         use writer = 
-            SerialiserStreamWrapper.Make( msw )
+            SerdeStreamWrapper.Make( msw )
                         
         v |> s.Serialise contentType writer 
         
@@ -21,7 +21,7 @@ module Helpers =
             new System.IO.MemoryStream( bs )
             
         use reader = 
-            SerialiserStreamWrapper.Make( msr )
+            SerdeStreamWrapper.Make( msr )
                         
         s.Deserialise contentType typeName reader 
       
@@ -32,7 +32,7 @@ module Helpers =
             new System.IO.MemoryStream( bs ) 
             
         use reader = 
-            SerialiserStreamWrapper.Make( msr ) 
+            SerdeStreamWrapper.Make( msr ) 
                 
         s.DeserialiseT<'T> contentType reader 
         

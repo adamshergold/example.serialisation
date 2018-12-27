@@ -1,4 +1,4 @@
-namespace Example.Serialisation.Tests
+namespace Example.Serialisation.Core.Tests
 
 open Microsoft.Extensions.Logging 
 
@@ -6,7 +6,7 @@ open Xunit
 open Xunit.Abstractions 
 
 open Example.Serialisation
-open Example.Serialisation.Tests 
+open Example.Serialisation.Core.Tests 
 
 type BenchmarkShould( oh: ITestOutputHelper ) = 
 

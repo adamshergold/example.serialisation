@@ -1,4 +1,4 @@
-namespace Example.Serialisation.Tests
+namespace Example.Serialisation.Core.Tests
 
 open Microsoft.Extensions.Logging 
 
@@ -28,7 +28,7 @@ type SerialiserShould( oh: ITestOutputHelper ) =
             new System.IO.MemoryStream()
                     
         use writeStream = 
-            SerialiserStreamWrapper.Make( msw )            
+            SerdeStreamWrapper.Make( msw )            
                     
         v |> serialiser.Serialise None writeStream
 
@@ -36,7 +36,7 @@ type SerialiserShould( oh: ITestOutputHelper ) =
             new System.IO.MemoryStream( msw.ToArray() )
             
         use readStream = 
-            SerialiserStreamWrapper.Make( msr )            
+            SerdeStreamWrapper.Make( msr )            
         
         serialiser.Deserialise None typeName readStream 
 
@@ -49,10 +49,10 @@ type SerialiserShould( oh: ITestOutputHelper ) =
                     
             Serde.Make( options ) 
             
-        sut.TryRegisterAssembly (typeof<Example.Serialisation.BinaryProxy>.Assembly) |> ignore            
+        sut.TryRegisterAssembly (typeof<Example.Serialisation.Binary.BinaryProxy>.Assembly) |> ignore            
         sut.TryRegisterAssembly (typeof<Example.Serialisation.TestTypes.Example.Person>.Assembly) |> ignore
         sut.TryRegister Example.Serialisation.Json.Serialisers.AnyJsonSerialiser |> ignore
-        sut.TryRegister Example.Serialisation.Serialisers.AnyBinarySerialiser |> ignore
+        sut.TryRegister Example.Serialisation.Binary.Serialisers.AnyBinarySerialiser |> ignore
     
         fun () -> sut 
             

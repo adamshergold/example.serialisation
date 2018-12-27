@@ -1,4 +1,6 @@
-namespace Example.Serialisation
+namespace Example.Serialisation.Binary
+
+open Example.Serialisation
 
 type BinaryProxy( wrapper: ITypeWrapper ) =
 

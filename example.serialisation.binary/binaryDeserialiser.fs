@@ -1,6 +1,8 @@
-namespace Example.Serialisation
+namespace Example.Serialisation.Binary
 
 open Microsoft.Extensions.Logging 
+
+open Example.Serialisation
 
 type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) = 
 
@@ -88,7 +90,7 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
                         new System.IO.MemoryStream( tw.Body ) 
                         
                     use stream =
-                        SerialiserStreamWrapper.Make( ms )
+                        SerdeStreamWrapper.Make( ms )
                         
                     match serialiser.Deserialise tw.ContentType tw.TypeName stream with 
                     | :? ITypeSerialisable as ts ->

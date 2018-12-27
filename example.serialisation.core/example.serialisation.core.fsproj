@@ -9,17 +9,11 @@
   <ItemGroup>
     
     <Compile Include="interfaces.fs" />
-    <Compile Include="binaryPeekStreamWrapper.fs" />
     <Compile Include="typeWrapper.fs" />
     <Compile Include="serde.fs" />
-    <Compile Include="serialiserStreamWrapper.fs" />
+    <Compile Include="serdeStreamWrapper.fs" />
     <Compile Include="helpers.fs" />
-    <Compile Include="binaryProxy.fs" />
     <Compile Include="any.fs" />
-    <Compile Include="binarySerialiser.fs" />    
-    <Compile Include="binaryDeserialiser.fs" />
-    <Compile Include="anySerialiser.fs" />
-    
   </ItemGroup>
 
   <ItemGroup>

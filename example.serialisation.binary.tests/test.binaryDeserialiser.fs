@@ -1,13 +1,12 @@
 namespace Example.Serialisation.Binary.Tests
 
+open Example.Serialisation
+
+open Example.Serialisation.Binary
 open Xunit
 open Xunit.Abstractions
 
-
-open Example.Serialisation
-open Example.Serialisation.Binary
-
-type BinarySerialiserShould( oh: ITestOutputHelper ) =
+type BinaryDeserialiserShould( oh: ITestOutputHelper ) =
     
     let logger =
         let options = { Logging.Options.Default with OutputHelper = Some oh } 
@@ -15,18 +14,17 @@ type BinarySerialiserShould( oh: ITestOutputHelper ) =
         
     [<Fact>]
     member this.``BeCreateable`` () = 
-
-        use ms =
+        
+        let serde = 
+            Helpers.DefaultSerde
+            
+        use ms = 
             new System.IO.MemoryStream()
-
+            
         use serdeStream =
             SerdeStreamWrapper.Make( ms )
-                        
+            
         use sut =
-                
-            let serde =
-                Serde.Make()
-                
             BinaryDeserialiser.Make( serde, serdeStream, "test" )
             
-        Assert.Equal( "test", sut.TypeName )
+        Assert.Equal( "test", sut.TypeName )            

@@ -12,6 +12,7 @@
     <Compile Include="helpers.fs" />
     <Compile Include="test.binaryProxy.fs" />
     <Compile Include="test.binarySerialiser.fs" />
+    <Compile Include="test.binaryDeserialiser.fs" />
     <Compile Include="test.binaryPeekStreamWrapper.fs" />
   </ItemGroup>
     

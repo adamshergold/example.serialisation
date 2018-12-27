@@ -4,16 +4,16 @@ open Example.Serialisation
 
 module Helpers = 
     
-    let Serialiser () =
+    let Serde () =
     
         let options =   
             SerdeOptions.Default
          
-        let serialiser = 
+        let serde = 
             Serde.Make( options )
             
-        serialiser                 
+        serde                 
         
-    let DefaultSerialiser = 
-        Serialiser() 
+    let DefaultSerde = 
+        Serde() 
                 

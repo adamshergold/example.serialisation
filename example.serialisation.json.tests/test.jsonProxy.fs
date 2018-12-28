@@ -30,31 +30,31 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
         
         Assert.True( true )
 
-
     [<Fact>]
-    member this.``SerialiseDeserialise`` () =
+    member this.``SerialiseDeserialise-BinaryProxy`` () =
         
-        let wrapper =
-            let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
-            let body = json |> System.Text.Encoding.UTF8.GetBytes
-            TypeWrapper.Make( Some "json", "foo", body )
-            
         use sut =
+            
+            let wrapper =
+                let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
+                let body = json |> System.Text.Encoding.UTF8.GetBytes
+                TypeWrapper.Make( Some "json", "JsonProxy", body )
+            
             JsonProxy.Make( wrapper )
         
         let serde =
             Serde.Make( SerdeOptions.Default )
             
-        use ms =
+        use outMemStream =
             new System.IO.MemoryStream()
             
         use outStream =
-            SerdeStreamWrapper.Make( ms )
+            SerdeStreamWrapper.Make( outMemStream )
             
         sut |> JsonProxy.BinarySerialiser.Serialise serde outStream
         
         let serialised =
-            ms.ToArray()
+            outMemStream.ToArray()
             
         use inMemStream =
             new System.IO.MemoryStream( serialised )
@@ -68,7 +68,51 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
         Assert.Equal( rt.Wrapper.TypeName, sut.Wrapper.TypeName )
         Assert.Equal( rt.Wrapper.ContentType, sut.Wrapper.ContentType )
         Assert.Equal( rt.Wrapper.Body.Length, sut.Wrapper.Body.Length )
+        
+    [<Fact>]
+    member this.``SerialiseDeserialise-JsonProxy`` () =
+        
+        use sut =
+            
+            let wrapper =
+                let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
+                let body = json |> System.Text.Encoding.UTF8.GetBytes
+                TypeWrapper.Make( Some "json", "JsonProxy", body )
+            
+            JsonProxy.Make( wrapper )
+        
+        let serde =
+            Serde.Make( SerdeOptions.Default )
+            
+        use outMemStream =
+            new System.IO.MemoryStream()
+            
+        use outStream =
+            SerdeStreamWrapper.Make( outMemStream )
+            
+        sut |> JsonProxy.JsonSerialiser.Serialise serde outStream
+        
+        let serialised =
+            outMemStream.ToArray()
+            
+        use inMemStream =
+            new System.IO.MemoryStream( serialised )
+            
+        use inStream =
+            SerdeStreamWrapper.Make( inMemStream  )
 
+        let rt =
+            JsonProxy.JsonSerialiser.Deserialise serde inStream
+        
+        Assert.Equal( rt.Wrapper.TypeName, sut.Wrapper.TypeName )
+        Assert.Equal( rt.Wrapper.ContentType, sut.Wrapper.ContentType )
+
+        let v = sut.Wrapper.Body |> System.Text.Encoding.UTF8.GetString
+        let rv = rt.Wrapper.Body |> System.Text.Encoding.UTF8.GetString
+        
+        
+        logger.LogInformation( "{v}", v )
+        logger.LogInformation( "{rv}", rv )
 
 
 

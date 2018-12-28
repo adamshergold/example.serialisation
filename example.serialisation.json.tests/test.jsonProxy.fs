@@ -31,6 +31,44 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
         Assert.True( true )
 
 
+    [<Fact>]
+    member this.``SerialiseDeserialise`` () =
+        
+        let wrapper =
+            let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
+            let body = json |> System.Text.Encoding.UTF8.GetBytes
+            TypeWrapper.Make( Some "json", "foo", body )
+            
+        use sut =
+            JsonProxy.Make( wrapper )
+        
+        let serde =
+            Serde.Make( SerdeOptions.Default )
+            
+        use ms =
+            new System.IO.MemoryStream()
+            
+        use outStream =
+            SerdeStreamWrapper.Make( ms )
+            
+        sut |> JsonProxy.BinarySerialiser.Serialise serde outStream
+        
+        let serialised =
+            ms.ToArray()
+            
+        use inMemStream =
+            new System.IO.MemoryStream( serialised )
+            
+        use inStream =
+            SerdeStreamWrapper.Make( inMemStream  )
+
+        let rt =
+            JsonProxy.BinarySerialiser.Deserialise serde inStream
+        
+        Assert.Equal( rt.Wrapper.TypeName, sut.Wrapper.TypeName )
+        Assert.Equal( rt.Wrapper.ContentType, sut.Wrapper.ContentType )
+        Assert.Equal( rt.Wrapper.Body.Length, sut.Wrapper.Body.Length )
+
 
 
 

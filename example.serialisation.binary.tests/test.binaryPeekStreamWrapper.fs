@@ -48,7 +48,9 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ms =
             new System.IO.MemoryStream()
             
-        let sut = sut( ms )
+        use sut = sut( ms )
+        
+        Assert.Same( ms, (sut :> ISerdeStream).Stream )
         
         Assert.True( true )                    
 
@@ -61,7 +63,7 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ts =
             testStream ( fun bw -> bw.Write( tv ) )
         
-        let sut = sut( ts )
+        use sut = sut( ts )
 
         Assert.Equal( tv, sut.PeekString() )
         Assert.Equal( tv, sut.ReadString() )
@@ -75,7 +77,7 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ts =
             testStream ( fun bw -> bw.Write( tv ) )
         
-        let sut = sut( ts )
+        use sut = sut( ts )
 
         Assert.Equal( tv, sut.ReadInt8() )        
 
@@ -88,7 +90,7 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ts =
             testStream ( fun bw -> bw.Write( tv ) )
         
-        let sut = sut( ts )
+        use sut = sut( ts )
 
         Assert.Equal( tv, sut.ReadInt64() )        
         
@@ -101,7 +103,7 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ts =
             testStream ( fun bw -> bw.Write( tv ) )
         
-        let sut = sut( ts )
+        use sut = sut( ts )
 
         Assert.Equal( tv, sut.ReadDouble() )        
 
@@ -113,7 +115,7 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ts =
             testStream ( fun bw -> bw.Write( tv ) )
         
-        let sut = sut( ts )
+        use sut = sut( ts )
 
         Assert.Equal( tv, sut.ReadBool() )        
         
@@ -125,7 +127,7 @@ type PeekStreamWrapperShould( oh: ITestOutputHelper ) =
         use ts =
             testStream ( fun bw -> bw.Write( tv ) )
         
-        let sut = sut( ts )
+        use sut = sut( ts )
 
         let vs =
             sut.ReadBytes( 3 )

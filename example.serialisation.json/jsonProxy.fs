@@ -159,42 +159,67 @@ with
                             else 
                                 failwithf "Invalid json structure when attempting to deserialise a proxy"                                            
                             
-                        tokens.Add( reader.Read() )
-                        
-                        while (reader.Peek().Token <> JsonToken.EndObject) && !nesting > 0 do
-                        
-                            if reader.Peek().Token = JsonToken.StartObject then 
-                                System.Threading.Interlocked.Increment(nesting) |> ignore
-                            elif reader.Peek().Token = JsonToken.EndObject then
-                                System.Threading.Interlocked.Decrement(nesting) |> ignore
-                            else
-                                ()
-                                
-                            tokens.Add( reader.Read() )
-                            
-                        tokens.Add( reader.Read() )   
-                                 
-                        let body = 
-                            
-                            use ms = 
-                                new System.IO.MemoryStream()
-                                
-                            use writer =
-                            
-                                use sw = 
-                                    new System.IO.StreamWriter( ms, System.Text.Encoding.UTF8, 1024, true )
-                                    
-                                new JsonTextWriter( sw )   
-                                            
-                            tokens |> Seq.iter ( fun item ->
-                                writer.WriteToken (item.Token,item.Value) )
-                                
-                            writer.Flush()
-                            
-                            ms.ToArray() 
-                                                                                                          
                         let wrapper =
-                            TypeWrapper.Make( Some this.ContentType, proxying, body ) 
+                            if proxying = "JsonProxy" then
+                                
+                                use jds =
+                                    JsonDeserialiser.Make( serialiser, wrapper, this.ContentType, this.TypeName )
+            
+                                jds.Handlers.On "ContentType" ( jds.ReadString )
+                                jds.Handlers.On "TypeName" ( jds.ReadString )
+                                jds.Handlers.On "Body" ( jds.ReadString )
+            
+                                jds.Deserialise()
+
+                                let contentType =
+                                    jds.Handlers.TryItem<string>( "ContentType")
+                                    
+                                let typeName =
+                                    jds.Handlers.TryItem<string>( "TypeName" ).Value
+                                    
+                                let bodyBase64 =
+                                    jds.Handlers.TryItem<string>( "Body" ).Value
+                                    
+                                let body =
+                                    bodyBase64 |> FromBase64
+                                
+                                TypeWrapper.Make( contentType, typeName, body )                                                            
+                            else
+                                tokens.Add( reader.Read() )
+                                
+                                while (reader.Peek().Token <> JsonToken.EndObject) && !nesting > 0 do
+                                
+                                    if reader.Peek().Token = JsonToken.StartObject then 
+                                        System.Threading.Interlocked.Increment(nesting) |> ignore
+                                    elif reader.Peek().Token = JsonToken.EndObject then
+                                        System.Threading.Interlocked.Decrement(nesting) |> ignore
+                                    else
+                                        ()
+                                        
+                                    tokens.Add( reader.Read() )
+                                    
+                                tokens.Add( reader.Read() )   
+                                         
+                                let body = 
+                                    
+                                    use ms = 
+                                        new System.IO.MemoryStream()
+                                        
+                                    use writer =
+                                    
+                                        use sw = 
+                                            new System.IO.StreamWriter( ms, System.Text.Encoding.UTF8, 1024, true )
+                                            
+                                        new JsonTextWriter( sw )   
+                                                    
+                                    tokens |> Seq.iter ( fun item ->
+                                        writer.WriteToken (item.Token,item.Value) )
+                                        
+                                    writer.Flush()
+                                    
+                                    ms.ToArray() 
+                                                                                                              
+                                TypeWrapper.Make( Some this.ContentType, proxying, body ) 
                                                                 
                         JsonProxy.Make( wrapper ) }
                         

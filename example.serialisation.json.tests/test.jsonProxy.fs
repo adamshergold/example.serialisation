@@ -77,7 +77,7 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
             let wrapper =
                 let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
                 let body = json |> System.Text.Encoding.UTF8.GetBytes
-                TypeWrapper.Make( Some "json", "JsonProxy", body )
+                TypeWrapper.Make( Some "json", "foo", body )
             
             JsonProxy.Make( wrapper )
         
@@ -95,6 +95,11 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
         let serialised =
             outMemStream.ToArray()
             
+        let json =
+            serialised |> System.Text.Encoding.UTF8.GetString
+        
+        logger.LogInformation( "{Json}", json )
+        
         use inMemStream =
             new System.IO.MemoryStream( serialised )
             
@@ -110,10 +115,7 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
         let v = sut.Wrapper.Body |> System.Text.Encoding.UTF8.GetString
         let rv = rt.Wrapper.Body |> System.Text.Encoding.UTF8.GetString
         
-        
-        logger.LogInformation( "{v}", v )
-        logger.LogInformation( "{rv}", rv )
-
+        Assert.Equal( v, rv )
 
 
 

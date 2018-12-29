@@ -3,6 +3,8 @@
 open Xunit
 open Xunit.Abstractions
 
+open Example.Serialisation
+
 type TypeWrapperShould( oh: ITestOutputHelper ) =
     
     let logger =
@@ -10,5 +12,13 @@ type TypeWrapperShould( oh: ITestOutputHelper ) =
         Logging.CreateLogger options
         
     [<Fact>]
-    member this.``AllTestsPass`` () = 
-        Assert.True(true)
+    member this.``BeCreateable`` () =
+        
+        let tw =
+            TypeWrapper.Make( Some "json", "foo", Array.empty )
+            
+        Assert.True( tw.ToString().Length > 0 )
+        
+        Assert.Equal( typeof<TypeWrapper>, (tw :> ITypeSerialisable).Type )
+                                
+                            

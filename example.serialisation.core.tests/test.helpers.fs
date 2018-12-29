@@ -50,10 +50,41 @@ type HelpersShould( oh: ITestOutputHelper ) =
             
         Assert.Equal( p', p )
         
-        //let p' = 
-        //    Helpers.DeserialiseT<_> serialiser (Some "json") bytes 
-        //Assert.Equal( p, p' )
         
-    
+    [<Fact>]
+    member this.``DeserialiseT`` () = 
+        
+        let serde =   
+            serde() 
+            
+        let p = 
+            Example.Serialisation.TestTypes.Extensions.Person.Examples.[0]
+                       
+        let bytes = 
+            p |> Helpers.Serialise serde (Some "json") 
+        
+        Assert.True( bytes.Length > 0  )
+
+        let p' =
+            Helpers.DeserialiseT<_> serde (Some "json") bytes
+            
+        Assert.Equal( p', p )    
+        
+    [<Fact>]
+    member this.``WrapUnwrap`` () = 
+        
+        let serde =   
+            serde() 
+            
+        let p = 
+            Example.Serialisation.TestTypes.Extensions.Person.Examples.[0]
+                       
+        let wrapped =
+            Helpers.Wrap serde p (["json"])
+            
+        let unwrapped =
+            wrapped |> Helpers.Unwrap serde
+            
+        Assert.Equal( unwrapped, p )            
         
         

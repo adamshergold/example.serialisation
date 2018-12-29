@@ -17,7 +17,8 @@ and ITypeSerialiser<'Source> =
     abstract Serialise   : ISerde -> ISerdeStream -> 'Source ->  unit
     abstract Deserialise : ISerde -> ISerdeStream -> 'Source
     
-and ITypeWrapper = 
+and ITypeWrapper =
+    inherit ITypeSerialisable
     abstract ContentType : string option with get
     abstract TypeName : string with get
     abstract Body : byte[] with get

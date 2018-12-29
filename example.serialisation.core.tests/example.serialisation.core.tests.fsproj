@@ -14,8 +14,10 @@
     <Compile Include="test.interfaces.fs" />
     <Compile Include="test.serdeStreamWrapper.fs" />
     <Compile Include="test.typeWrapper.fs" />
-    <Compile Include="test.serialiser.fs" />
+    <Compile Include="test.serde.fs" />
+    <Compile Include="test.any.fs" />
     <Compile Include="test.benchmark.fs" />
+    <Compile Include="test.examples.fs" />
   </ItemGroup>
     
   <ItemGroup>

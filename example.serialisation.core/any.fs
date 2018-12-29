@@ -17,6 +17,9 @@ with
     static member Make( v: int64 ) = 
         Any.Int64( v ) 
 
+    static member Make( v: double ) = 
+        Any.Double( v ) 
+    
     static member Make( v: string ) = 
         Any.String( v ) 
      

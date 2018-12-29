@@ -9,7 +9,7 @@ open Example.Serialisation
 open Example.Serialisation.TestTypes
 open Example.Serialisation.TestTypes.Extensions 
 
-type SerialiserShould( oh: ITestOutputHelper ) = 
+type ExamplesShould( oh: ITestOutputHelper ) = 
 
     let logger =
     
@@ -126,20 +126,6 @@ type SerialiserShould( oh: ITestOutputHelper ) =
                 yield! (myAnys "binary")
             }
                              
-    [<Fact>]
-    member this.``RegisterByReflection`` () =
-    
-        let sut = 
-            Serde.Make( )
-            
-        let nItems =             
-            sut.TryRegisterAssembly typeof<Example.Serialisation.TestTypes.Example.Person>.Assembly
-            
-        Assert.True( nItems > 0 )
-
-        Assert.Equal( nItems, sut.Items |> Seq.length )                    
-
-                    
     [<Theory>]
     [<MemberData("Examples")>]
     member this.``RoundTrip`` (contentType:string) (typeName:string) (v:obj) = 

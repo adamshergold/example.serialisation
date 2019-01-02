@@ -2,6 +2,7 @@ namespace Example.Serialisation.Json
 
 open Newtonsoft.Json 
 
+
 type ReaderItem = 
     {
         Token : JsonToken
@@ -9,7 +10,6 @@ type ReaderItem =
     }
 
 type PeekReader( count: int, reader: JsonTextReader ) as this =
-
     let mutable items = new System.Collections.Generic.Queue<ReaderItem>()
     
     let mutable drained = false 
@@ -31,6 +31,9 @@ type PeekReader( count: int, reader: JsonTextReader ) as this =
     member val Count = count
 
 with
+    static member Make( count, reader ) =
+        new PeekReader( count, reader )
+        
     member this.Dispose () = 
         () 
         

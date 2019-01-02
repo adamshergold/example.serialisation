@@ -1,6 +1,7 @@
 namespace Example.Serialisation.TestTypes.Example
 
 open Example.Serialisation
+open Example.Serialisation.Binary
 open Example.Serialisation.Json
 
 type Empty () = class end
@@ -37,10 +38,8 @@ module private Empty_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, Some this.ContentType )
+                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
 
-                    bds.Start( this.TypeName )
-                    
                     let result = 
                         new Empty()
                         

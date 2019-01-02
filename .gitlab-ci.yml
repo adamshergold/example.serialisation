@@ -2,21 +2,30 @@ image: microsoft/dotnet:2.2-sdk
 stages:
   - build
   - test
-
-before_script:
-  - apt-get update
-  - apt-get install -y libgit2-dev 
-  - ln -s /usr/lib/x86_64-linux-gnu/libgit2.so /lib/x86_64-linux-gnu/libgit2-15e1193.so
-  - curl -s https://codecov.io/bash > codecov
-  - chmod +x codecov
+  - publish
 
 build:
   stage: build
   script:
+    - ./etc/build/gitversion.sh
     - dotnet build example.serialisation.sln
 
 test:
   stage: test
   script:
-    - dotnet test example.serialisation.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-    - ./codecov -f example.serialisation.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+    - ./etc/build/gitversion.sh
+    - curl -s https://codecov.io/bash > codecov
+    - chmod +x codecov
+    - dotnet test example.serialisation.core.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.core.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+    - dotnet test example.serialisation.json.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.json.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+    - dotnet test example.serialisation.binary.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - ./codecov -f example.serialisation.binary.tests/coverage.opencover.xml -t $CODECOV_TOKEN
+
+publish:
+  stage: publish
+  script:    
+    - ./etc/build/gitversion.sh
+    - dotnet pack example.serialisation -o /tmp/nupkgs
+    - dotnet nuget push /tmp/nupkgs/* -k $MYGET_APIKEY -s $MYGET_URL

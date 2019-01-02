@@ -1,6 +1,7 @@
 namespace Example.Serialisation.TestTypes.Example
 
 open Example.Serialisation
+open Example.Serialisation.Binary
 open Example.Serialisation.Json
 
 type Status = 
@@ -41,10 +42,8 @@ module private Status_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, Some this.ContentType )
+                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
 
-                    bds.Start( this.TypeName )
-                    
                     match bds.ReadString() with
                     | _ as v when v = "Single" ->
                         Status.Single 

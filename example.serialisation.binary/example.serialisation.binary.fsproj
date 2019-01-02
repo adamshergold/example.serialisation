@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../etc/common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="binaryPeekStreamWrapper.fs" />
+    <Compile Include="binaryProxy.fs" />
+    <Compile Include="binarySerialiser.fs" />    
+    <Compile Include="binaryDeserialiser.fs" />
+    <Compile Include="anySerialiser.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="$(Example-GitVersionTask-Version)">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="FSharp.Core" Version="$(Example-FSharp-Core-Version)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(Example-Microsoft-Extensions-Logging-Version)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\example.serialisation.core\example.serialisation.core.fsproj" />
+  </ItemGroup>
+
+ 
+</Project>

@@ -1,6 +1,7 @@
 namespace Example.Serialisation.TestTypes.Example
 
 open Example.Serialisation
+open Example.Serialisation.Binary
 open Example.Serialisation.Json
 
 type Phone = {
@@ -48,12 +49,10 @@ module private Phone_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, Some this.ContentType )
+                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
 
-                    bds.Start( this.TypeName )
-                    
                     let _Code = 
-                        if bds.ReadBoolean() then 
+                        if bds.ReadBool() then 
                             Some( bds.ReadString() ) 
                         else 
                             None

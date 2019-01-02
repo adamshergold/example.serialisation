@@ -1,6 +1,7 @@
 namespace Example.Serialisation.TestTypes.Example
 
 open Example.Serialisation
+open Example.Serialisation.Binary
 open Example.Serialisation.Json
 
 type Score = {
@@ -45,15 +46,13 @@ module private Score_Serialisers =
                 member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, Some this.ContentType )
-
-                    bds.Start( this.TypeName )
+                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
                     
                     let mark = 
                         bds.ReadDouble()
                         
                     let pass = 
-                        bds.ReadBoolean()
+                        bds.ReadBool()
                     
                     Score.Make( mark, pass ) }
                     

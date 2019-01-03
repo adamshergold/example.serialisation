@@ -6,7 +6,7 @@ stages:
   - build-test-publish
 
 build-test-publish:
-  stage: build
+  stage: build-test-publish
   script:
     - ./etc/build/gitversion.sh
     - dotnet build example.serialisation.sln

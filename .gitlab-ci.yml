@@ -18,8 +18,8 @@ build-test-publish:
     - ./codecov -f example.serialisation.json.tests/coverage.opencover.xml -t $CODECOV_TOKEN
     - dotnet test example.serialisation.binary.tests /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     - ./codecov -f example.serialisation.binary.tests/coverage.opencover.xml -t $CODECOV_TOKEN
-    - dotnet pack example.serialisation -o /tmp/nupkgs
-    - dotnet nuget push /tmp/nupkgs/* -k $MYGET_APIKEY -s $MYGET_URL
+    - dotnet pack example.serialisation -o $CI_PROJECT_DIR/nupkgs
+    - dotnet nuget push $CI_PROJECT_DIR/nupkgs/* -k $MYGET_APIKEY -s $MYGET_URL
 
 # build:
 #   stage: build

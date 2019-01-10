@@ -1,5 +1,7 @@
 namespace Example.Serialisation.Json
 
+open System
+open System.Collections
 open Newtonsoft.Json 
 
 type IPropertyHandler =
@@ -8,23 +10,24 @@ type IPropertyHandler =
     abstract Has : string -> bool
     abstract TryItem<'T> : string -> 'T option
 
+type PropertyHandler( reader: PeekReader, comparison: System.StringComparison ) =
 
-type PropertyHandler( ) =
-
+    let sc =
+        Utilities.LookupStringComparer comparison
+        
     let cbs = 
-        new System.Collections.Generic.Dictionary<string,unit->obj>()
+        new System.Collections.Generic.Dictionary<string,unit->obj>( sc )
      
     let items = 
-        new System.Collections.Generic.Dictionary<string,obj>()
+        new System.Collections.Generic.Dictionary<string,obj>( sc )
     
 with
-    static member Make() = 
-        new PropertyHandler() :> IPropertyHandler
+    static member Make( reader, comparison ) = 
+        new PropertyHandler( reader, comparison ) :> IPropertyHandler
     
     member this.Dispose () = 
         cbs.Clear()
         items.Clear()
-       
        
     member this.Has property = 
         items.ContainsKey property 
@@ -32,7 +35,7 @@ with
     member this.Handle property =
         match cbs.TryGetValue property with
         | false, _ ->
-            ()
+            reader.Skip()
         | true, cb ->
             items.Add( property, cb() )
         

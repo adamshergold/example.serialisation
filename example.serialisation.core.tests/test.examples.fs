@@ -22,23 +22,23 @@ type ExamplesShould( oh: ITestOutputHelper ) =
             
         Logging.CreateLogger options
 
-    let roundTrip (serialiser:ISerde) (typeName:string) (v:obj) = 
-    
-        use msw = 
-            new System.IO.MemoryStream()
-                    
-        use writeStream = 
-            SerdeStreamWrapper.Make( msw )            
-                    
-        v |> serialiser.Serialise None writeStream
-
-        use msr = 
-            new System.IO.MemoryStream( msw.ToArray() )
-            
-        use readStream = 
-            SerdeStreamWrapper.Make( msr )            
-        
-        serialiser.Deserialise None typeName readStream 
+//    let roundTrip (serde:ISerde) (typeName:string) (v:obj) = 
+//    
+//        use msw = 
+//            new System.IO.MemoryStream()
+//                    
+//        use writeStream = 
+//            SerdeStreamWrapper.Make( msw )            
+//                    
+//        v |> serialiser.Serialise None writeStream
+//
+//        use msr = 
+//            new System.IO.MemoryStream( msw.ToArray() )
+//            
+//        use readStream = 
+//            SerdeStreamWrapper.Make( msr )            
+//        
+//        serialiser.Deserialise None typeName readStream 
 
     let sut = 
     
@@ -133,12 +133,12 @@ type ExamplesShould( oh: ITestOutputHelper ) =
         let sut = sut()
 
         let bytes = 
-            Helpers.Serialise sut (Some contentType) v
+            Helpers.Serialise sut contentType v
           
         logger.LogInformation( "{ContentType} nBytes {Bytes}", contentType, bytes.Length )
                     
         let rt = 
-            Helpers.Deserialise sut (Some contentType) typeName bytes 
+            Helpers.Deserialise sut contentType typeName bytes 
                     
         Assert.Equal( v, rt )            
         

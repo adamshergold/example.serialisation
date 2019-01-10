@@ -20,7 +20,9 @@ type PropertyHandlerShould( oh: ITestOutputHelper ) =
     member this.``BeCreateable`` () =
         
         let sut =
-            PropertyHandler.Make()
+            let tr = new System.IO.StringReader("")
+            let reader = PeekReader.Make( 0, new JsonTextReader(tr))
+            PropertyHandler.Make( reader, System.StringComparison.Ordinal )
         
         Assert.False( sut.Has "foo" )
             

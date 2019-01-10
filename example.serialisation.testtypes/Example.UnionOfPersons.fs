@@ -27,10 +27,10 @@ module private UnionOfPersons_Serialisers =
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
     
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     match v with 
                     | Nobody -> 
@@ -40,10 +40,10 @@ module private UnionOfPersons_Serialisers =
                         bs.Write( (int32) v.Length ) 
                         v |> Seq.iter ( fun item -> bs.Write( item ) )
                         
-                member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
+                        BinaryDeserialiser.Make( serde, s, this.TypeName )
                     
                     match bds.ReadString() with
                     | _ as v when v = "Nobody" ->
@@ -67,13 +67,13 @@ module private UnionOfPersons_Serialisers =
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     match v with
@@ -88,10 +88,10 @@ module private UnionOfPersons_Serialisers =
 
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
                     jds.Handlers.On "Nobody" ( jds.ReadNull )
                     jds.Handlers.On "Persons" ( jds.ReadArray<Example.Serialisation.TestTypes.Example.Person>( jds.ReadRecord "Example.Person" ) )

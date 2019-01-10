@@ -2,6 +2,7 @@ namespace Example.Serialisation.Json
 
 open Newtonsoft.Json
 
+open System
 open Example.Serialisation
 open Example.Serialisation.Binary
 
@@ -64,31 +65,31 @@ with
                     member this.ContentType 
                         with get () = "binary" 
                                                 
-                    member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                    member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                         use bs = 
-                            BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                            BinarySerialiser.Make( serde, stream, this.TypeName )
                          
-                        bs.Write( v.Wrapper.ContentType.IsSome )
-                        if v.Wrapper.ContentType.IsSome then 
-                            bs.Write( v.Wrapper.ContentType.Value )
+                        bs.Write( v.Wrapper.ContentType )
                             
-                        bs.Write( v.Wrapper.TypeName )
+                        bs.Write( v.Wrapper.TypeName.IsSome )
+                        if v.Wrapper.TypeName.IsSome then 
+                            bs.Write( v.Wrapper.TypeName.Value )
                        
                         bs.Write( (int32) v.Wrapper.Body.Length ) 
                         bs.Write( v.Wrapper.Body ) 
                                                        
 
-                    member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                    member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                     
                         use bds = 
-                            BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+                            BinaryDeserialiser.Make( serde, stream, this.TypeName )
                             
                         let contentType =
-                            if bds.ReadBool() then Some( bds.ReadString() ) else None 
+                            bds.ReadString()  
                             
                         let typeName = 
-                            bds.ReadString() 
+                            if bds.ReadBool() then Some( bds.ReadString() ) else None 
                             
                         let body = 
                             bds.ReadBytes( bds.ReadInt32() )
@@ -111,21 +112,21 @@ with
                     member this.ContentType 
                         with get () = "json" 
                                                 
-                    member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                    member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
                     
                         use js =
-                            JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                            JsonSerialiser.Make( serde, stream, this.ContentType )
     
                         js.WriteStartObject()
-                        js.WriteProperty "@type"
+                        js.WriteProperty serde.Options.TypeProperty
                         js.WriteValue this.TypeName
     
-                        if v.Wrapper.ContentType.IsSome then 
-                            js.WriteProperty "ContentType"
-                            js.Serialise v.Wrapper.ContentType.Value
+                        js.WriteProperty "ContentType"
+                        js.Serialise v.Wrapper.ContentType
                        
-                        js.WriteProperty "TypeName"
-                        js.Serialise v.Wrapper.TypeName
+                        if v.Wrapper.TypeName.IsSome then
+                            js.WriteProperty "TypeName"
+                            js.Serialise v.Wrapper.TypeName.Value
                         
                         js.WriteProperty "Body"
                         js.Serialise ( v.Wrapper.Body |> ToBase64 ) 
@@ -133,7 +134,7 @@ with
                         js.WriteEndObject()
     
         
-                    member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                    member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                     
                         use wrapper = 
                             JsonPeekReaderStreamWrapper.Make(stream)
@@ -144,26 +145,30 @@ with
                         let tokens = 
                             new System.Collections.Generic.List<ReaderItem>()
                         
-                        let nesting = ref 1
-                        
                         if reader.Peek().Token <> JsonToken.StartObject then 
                             failwithf "Can only use proxy for serialisation stream that is an object(like)"
 
-                        let proxying = 
-                            if reader.PeekTokenAt(1) = JsonToken.PropertyName then 
-                                let propertyV = reader.PeekAt(1).Value.ToString()
-                                if propertyV = "@type" then
-                                    unbox<string>(reader.PeekAt(2).Value)
+                        let proxying =
+                            
+                            if reader.PeekTokenAt(1) = JsonToken.PropertyName then
+                                
+                                let propertyV =
+                                    reader.PeekAt(1).Value.ToString()
+                                
+                                if  ( serde.Options.AllowableTypeProperties.IsNone && propertyV.Equals( serde.Options.TypeProperty, StringComparison.Ordinal ) )
+                                 || ( serde.Options.AllowableTypeProperties.IsSome && serde.Options.AllowableTypeProperties.Value.Contains( propertyV ) ) then     
+                                    Some <| unbox<string>( reader.PeekAt(2).Value )
                                 else    
-                                    failwithf "First property proxy sees must be '@type'"
+                                    None
                             else 
                                 failwithf "Invalid json structure when attempting to deserialise a proxy"                                            
                             
                         let wrapper =
-                            if proxying = "JsonProxy" then
+                            
+                            if proxying.IsSome && proxying.Value.Equals( "JsonProxy", System.StringComparison.Ordinal ) then
                                 
                                 use jds =
-                                    JsonDeserialiser.Make( serialiser, wrapper, this.ContentType, this.TypeName )
+                                    JsonDeserialiser.Make( serde, wrapper, this.ContentType, this.TypeName )
             
                                 jds.Handlers.On "ContentType" ( jds.ReadString )
                                 jds.Handlers.On "TypeName" ( jds.ReadString )
@@ -172,10 +177,10 @@ with
                                 jds.Deserialise()
 
                                 let contentType =
-                                    jds.Handlers.TryItem<string>( "ContentType")
+                                    jds.Handlers.TryItem<string>( "ContentType").Value
                                     
                                 let typeName =
-                                    jds.Handlers.TryItem<string>( "TypeName" ).Value
+                                    jds.Handlers.TryItem<string>( "TypeName" )
                                     
                                 let bodyBase64 =
                                     jds.Handlers.TryItem<string>( "Body" ).Value
@@ -183,12 +188,16 @@ with
                                 let body =
                                     bodyBase64 |> FromBase64
                                 
-                                TypeWrapper.Make( contentType, typeName, body )                                                            
+                                TypeWrapper.Make( contentType, typeName, body )
+                                
                             else
+                                let nesting = ref 1
+                                
                                 tokens.Add( reader.Read() )
                                 
-                                while (reader.Peek().Token <> JsonToken.EndObject) && !nesting > 0 do
-                                
+                                //while (reader.Peek().Token <> JsonToken.EndObject) && !nesting > 0 do
+                                while !nesting > 0 do
+                                    
                                     if reader.Peek().Token = JsonToken.StartObject then 
                                         System.Threading.Interlocked.Increment(nesting) |> ignore
                                     elif reader.Peek().Token = JsonToken.EndObject then
@@ -198,7 +207,7 @@ with
                                         
                                     tokens.Add( reader.Read() )
                                     
-                                tokens.Add( reader.Read() )   
+                                //tokens.Add( reader.Read() )   
                                          
                                 let body = 
                                     
@@ -208,7 +217,8 @@ with
                                     use writer =
                                     
                                         use sw = 
-                                            new System.IO.StreamWriter( ms, System.Text.Encoding.UTF8, 1024, true )
+                                            // Must do this to avoid BOM marker at start of stream
+                                            new System.IO.StreamWriter( ms, new System.Text.UTF8Encoding( false ), 1024, true )
                                             
                                         new JsonTextWriter( sw )   
                                                     
@@ -219,7 +229,7 @@ with
                                     
                                     ms.ToArray() 
                                                                                                               
-                                TypeWrapper.Make( Some this.ContentType, proxying, body ) 
+                                TypeWrapper.Make( this.ContentType, proxying, body ) 
                                                                 
                         JsonProxy.Make( wrapper ) }
                         

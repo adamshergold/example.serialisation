@@ -15,7 +15,7 @@ type TypeWrapperShould( oh: ITestOutputHelper ) =
     member this.``BeCreateable`` () =
         
         let tw =
-            TypeWrapper.Make( Some "json", "foo", Array.empty )
+            TypeWrapper.Make( "json", Some "foo", Array.empty )
             
         Assert.True( tw.ToString().Length > 0 )
         

@@ -32,10 +32,10 @@ module private MyAny_Serialisers =
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     bs.Write( (int32) v.BitsAndBobs.Count )
                     v.BitsAndBobs
@@ -43,10 +43,10 @@ module private MyAny_Serialisers =
                         bs.Write( k ) 
                         bs.Write( v ) )                                          
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use bds =
-                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+                        BinaryDeserialiser.Make( serde, stream, this.TypeName )
 
                     let _BitsAndBobs =
                         bds.ReadMap<Example.Serialisation.Any>( bds.ReadAny )
@@ -69,13 +69,13 @@ module private MyAny_Serialisers =
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     js.WriteProperty "BitsAndBobs"
@@ -89,10 +89,10 @@ module private MyAny_Serialisers =
                     
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
                     jds.Handlers.On "BitsAndBobs" ( jds.ReadMap<Any>( jds.ReadAny ) )
 

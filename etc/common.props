@@ -19,6 +19,7 @@
         <Example-Microsoft-NET-Test-Sdk-Version>15.9.0</Example-Microsoft-NET-Test-Sdk-Version>
         <Example-xunit-Version>2.4.0</Example-xunit-Version>
         <Example-xunit-runner-visualstudio-Version>2.4.0</Example-xunit-runner-visualstudio-Version>
+        <Example-Foq-Version>1.8.0</Example-Foq-Version>
 
     </PropertyGroup>
     

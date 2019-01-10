@@ -44,7 +44,41 @@ type PeekReaderShould( oh: ITestOutputHelper ) =
             
         Assert.Equal( item.Token, JsonToken.StartObject )
         
+    [<Fact>]
+    member this.``BeAbleToSkipScalar`` () =
+        
+        let sut =
+            sut 3 "{ \"name\" : \"john\", \"age\" : 21 }"
+            
+        sut.Read() |> ignore // start object
+        sut.Read() |> ignore // name
+        sut.Skip()
+        
+        Assert.Equal( "age", unbox<string>( sut.Read().Value ) )
+        
+    [<Fact>]
+    member this.``BeAbleToSkipObject`` () =
+        
+        let sut =
+            sut 3 "{ \"name\" : { \"formal\" : \"Jonathan\", \"inner\" : { \"foo\" : 123.4 } }, \"age\" : 21 }"
+            
+        sut.Read() |> ignore // start object
+        sut.Read() |> ignore // name
+        sut.Skip()
+        
+        Assert.Equal( "age", unbox<string>(sut.Read().Value) )
                     
+    [<Fact>]
+    member this.``BeAbleToSkipArray`` () =
+        
+        let sut =
+            sut 3 "{ \"name\" : [ { \"formal\" : [ 1,2,3 ] } ], \"age\" : 21 }"
+            
+        sut.Read() |> ignore // start object
+        sut.Read() |> ignore // name
+        sut.Skip()
+        
+        Assert.Equal( "age", unbox<string>(sut.Read().Value) )
 
                   
 

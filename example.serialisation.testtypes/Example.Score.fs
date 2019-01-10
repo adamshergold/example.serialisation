@@ -34,19 +34,19 @@ module private Score_Serialisers =
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
     
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     bs.Write( v.Mark ) 
                     
                     bs.Write( v.Pass )
                      
-                member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
+                        BinaryDeserialiser.Make( serde, s, this.TypeName )
                     
                     let mark = 
                         bds.ReadDouble()
@@ -68,13 +68,13 @@ module private Score_Serialisers =
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     js.WriteProperty "Mark"
@@ -85,10 +85,10 @@ module private Score_Serialisers =
                     
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
                     jds.Handlers.On "Mark" ( jds.ReadDouble )
                     jds.Handlers.On "Pass" ( jds.ReadBool )

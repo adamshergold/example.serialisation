@@ -28,12 +28,12 @@ type BinaryProxyShould( oh: ITestOutputHelper ) =
     member this.``BeCreateable`` () =
         
         let wrapper =
-            TypeWrapper.Make( Some "binary", "test", Array.empty )
+            TypeWrapper.Make( "binary", Some "test", Array.empty )
             
         let sut =
             BinaryProxy.Make( wrapper )
             
-        Assert.Equal( "test", sut.Wrapper.TypeName )
+        Assert.Equal( Some "test", sut.Wrapper.TypeName )
         
         Assert.Equal( typeof<BinaryProxy>, (sut :> ITypeSerialisable).Type )
         

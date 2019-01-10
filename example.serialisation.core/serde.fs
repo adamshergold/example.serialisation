@@ -1,9 +1,10 @@
 namespace Example.Serialisation
 
+open System
 open Microsoft.Extensions.Logging
 
 [<AutoOpen>]
-module SerdeImpl = 
+module private SerdeImpl = 
 
     type CacheItem = {
         Serialiser        : ISerde
@@ -16,12 +17,24 @@ module SerdeImpl =
         member this.Handles (t:System.Type) = 
             t = this.LocalType
             
-        member this.Deserialise (s:ISerdeStream) = 
-            this.DeserialiseMethod.Invoke( this.TypeSerialiser, [| this.Serialiser; s |] )
+        member this.Deserialise (s:ISerdeStream) =
+            try
+                this.DeserialiseMethod.Invoke( this.TypeSerialiser, [| this.Serialiser; s |] )
+            with
+            | :? System.Reflection.TargetInvocationException as tie ->
+                raise tie.InnerException
+            | _ as ex ->
+                reraise()
             
-        member this.Serialise (v:obj) (s:ISerdeStream) = 
-            this.SerialiseMethod.Invoke( this.TypeSerialiser, [| this.Serialiser; s; v |] ) |> ignore
-            
+        member this.Serialise (v:obj) (s:ISerdeStream) =
+            try
+                this.SerialiseMethod.Invoke( this.TypeSerialiser, [| this.Serialiser; s; v |] ) |> ignore
+            with
+            | :? System.Reflection.TargetInvocationException as tie ->
+                raise tie.InnerException
+            | _ as ex ->
+                reraise()
+                    
         static member Make( serialiser, lt, ts, sm, dm ) = 
             { Serialiser = serialiser; LocalType = lt; TypeSerialiser = ts; SerialiseMethod = sm; DeserialiseMethod = dm  }
     
@@ -44,27 +57,11 @@ module SerdeImpl =
             | Some item -> ()
             | None -> items.AddFirst( ci ) |> ignore
             
-        member this.TryForContentType (ct:string option) = 
-            if ct.IsSome then
-                items |> Seq.tryFind ( fun i -> i.TypeSerialiser.ContentType = ct.Value )
-            else 
-                Some this.Default   
+        member this.TryForContentType (ct:string) = 
+            items |> Seq.tryFind ( fun i -> i.TypeSerialiser.ContentType = ct )
 
-        member this.Default 
-            with get () = if items.Count = 1 then items.First.Value else failwithf "Unable to extract default as [%d] items" items.Count                            
-            
-type SerdeOptions = {
-    Logger : ILogger option
-    TypeWrapperFallback : bool
-    FallbackDeserialisers : Map<string option,string>
-}
-with 
-    static member Default = {
-        Logger = None
-        TypeWrapperFallback = false 
-        FallbackDeserialisers = Map.empty
-    }
-             
+
+    
 type Serde( options: SerdeOptions ) =
 
     let itemsBySystemType = 
@@ -79,7 +76,7 @@ type Serde( options: SerdeOptions ) =
         else 
             t
             
-    let tryLookupByTypeName (contentType:string option,typeName:string) =
+    let tryLookupByTypeName (contentType:string,typeName:string) =
     
         let finder (kvp:System.Collections.Generic.KeyValuePair<System.Type,ContentTypeItems>) = 
              kvp.Value.TypeName = typeName 
@@ -90,14 +87,19 @@ type Serde( options: SerdeOptions ) =
         | None ->
             None
 
-    let tryLookupBySystemType (contentType:string option,localType:System.Type) =
-        let st = normaliseType localType 
+    let tryLookupBySystemType (contentType:string,localType:System.Type) =
+        
+        let st =
+            normaliseType localType
+        
         match itemsBySystemType.TryGetValue( st ) with  
         | true, items -> 
             items.TryForContentType contentType 
         | false, _ -> 
             None                  
 
+    member val Options = options
+    
     static member BinaryWriter (s:System.IO.Stream) = 
         new System.IO.BinaryWriter( s, System.Text.Encoding.Default, true )
 
@@ -208,32 +210,14 @@ type Serde( options: SerdeOptions ) =
 
         candidates |> Seq.fold ( fun acc v -> acc + v ) 0 
                     
-    member this.TryLooukupBySystemType (contentType:string option) (t:System.Type) = 
-        let nt = normaliseType t
-        match itemsBySystemType.TryGetValue( nt ) with 
-        | true, items -> 
-            items.TryForContentType contentType
-        | false, _ -> 
-            None  
+    member this.TryLookupBySystemType (contentType:string) (t:System.Type) =
+        tryLookupBySystemType (contentType,t) |> Option.map ( fun ci -> ci.TypeSerialiser )
 
-    member this.TryLookup (contentType:string option,typeName:string) =
+    member this.TryLookupByTypeName (contentType:string) (typeName:string) =
         tryLookupByTypeName (contentType,typeName) |> Option.map ( fun ci -> ci.TypeSerialiser )
 
-    member this.TryLookup (contentType:string option,lt:System.Type) =
-        tryLookupBySystemType (contentType,lt) |> Option.map ( fun ci -> ci.TypeSerialiser )
-
-    member this.TypeName (contentType:string option) (t:System.Type) =
-        match tryLookupBySystemType (contentType,t) with 
-        | Some ci -> ci.TypeSerialiser.TypeName
-        | None -> failwithf "Unable to find serialier for system type [%O] / content-type [%O]" t contentType
-         
-    member this.SystemType (contentType:string option) (tn:string) =
-        match tryLookupByTypeName (contentType,tn) with 
-        | Some ci -> ci.LocalType 
-        | None -> failwithf "Unable to find serialier for type name [%s] / content-type [%O]" tn contentType
-        
                             
-    member this.Serialise (contentType:string option) (s:ISerdeStream) (v:obj) =
+    member this.Serialise (contentType:string) (s:ISerdeStream) (v:obj) =
         let nt = normaliseType (v.GetType())
         match itemsBySystemType.TryGetValue( nt ) with 
         | true, items ->
@@ -245,16 +229,16 @@ type Serde( options: SerdeOptions ) =
         | false, _ -> 
             failwithf "Unable to find serialiser for system type [%O]" nt     
 
-    member this.Extract (contentType:string option) (typeName:string) (s:ISerdeStream) =
+    member this.Extract (contentType:string) (typeName:string) (s:ISerdeStream) =
     
         use msr = 
             new System.IO.MemoryStream()
             
         s.Stream.CopyTo(msr)
         
-        TypeWrapper.Make( contentType, typeName, msr.ToArray() ) 
+        TypeWrapper.Make( contentType, Some typeName, msr.ToArray() ) 
     
-    member this.Deserialise (contentType:string option) (typeName:string) (s:ISerdeStream) =
+    member this.Deserialise (contentType:string) (typeName:string) (s:ISerdeStream) =
         
         match tryLookupByTypeName (contentType,typeName) with 
         | Some ci ->
@@ -280,22 +264,20 @@ type Serde( options: SerdeOptions ) =
                         
                     s.Stream.CopyTo(msr)
                     
-                    TypeWrapper.Make( contentType, typeName, msr.ToArray() ) :> obj
+                    TypeWrapper.Make( contentType, Some typeName, msr.ToArray() ) :> obj
                 else
                     failwithf "Unable to find serialiser for type name [%s]" typeName               
                         
                
-    member this.DeserialiseT<'T> (contentType:string option) (s:ISerdeStream) =
-        match itemsBySystemType.TryGetValue( typeof<'T> ) with 
-        | true, items ->
-            match items.TryForContentType contentType with 
-            | Some ci ->
-                match box(ci.Deserialise s) with 
-                | :? 'T as t -> t 
-                | _ as dv -> failwithf "Deserialised value of [%O] was not the expected type of [%O]" dv (typeof<'T>)
-            | None ->
-                 failwithf "Unable to find serialiser for system type [%O] / content type [%O]" (typeof<'T>) contentType
-        | false, _ ->                      
+    member this.DeserialiseT<'T> (contentType:string) (s:ISerdeStream) =
+        match tryLookupBySystemType (contentType, typeof<'T>) with
+        | Some ci ->
+            match box(ci.Deserialise s) with 
+            | :? 'T as t ->
+                t 
+            | _ as dv ->
+                failwithf "Deserialised value of [%O] was not the expected type of [%O]" dv (typeof<'T>)
+        | None ->                      
             failwithf "Unable to find serialiser for system type [%O] / content type [%O]" (typeof<'T>) contentType
                     
     interface ISerde 
@@ -309,11 +291,11 @@ type Serde( options: SerdeOptions ) =
             member this.Items = 
                 this.Items 
 
-            member this.TryLookupByTypeName (contentType:string option,typeName:string) = 
-                this.TryLookup (contentType,typeName)
+            member this.TryLookupByTypeName (contentType:string,typeName:string) = 
+                this.TryLookupByTypeName contentType typeName 
                 
-            member this.TryLookupBySystemType (contentType:string option,localType:System.Type) = 
-                this.TryLookup (contentType,localType) 
+            member this.TryLookupBySystemType (contentType:string,localType:System.Type) = 
+                this.TryLookupBySystemType contentType localType 
                                 
             member this.Serialise contentType serialiserStream v = 
                 this.Serialise contentType serialiserStream v                         
@@ -321,18 +303,10 @@ type Serde( options: SerdeOptions ) =
             member this.Deserialise contentType typeName v = 
                 this.Deserialise contentType typeName v 
 
-            member this.Extract contentType typeName s = 
-                this.Extract contentType typeName s 
-
             member this.DeserialiseT<'T> contentType stream = 
                 this.DeserialiseT<'T> contentType stream
-
-            member this.SystemType contentType tn = 
-                this.SystemType contentType tn 
                 
-            member this.TypeName contentType st = 
-                this.TypeName contentType st 
-                
-                
+            member this.Options =
+                this.Options
                             
             

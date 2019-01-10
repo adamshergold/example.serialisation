@@ -2,7 +2,7 @@ namespace Example.Serialisation
 
 module Helpers = 
         
-    let Serialise (s:ISerde) (contentType:string option) (v:obj) =
+    let Serialise (s:ISerde) (contentType:string) (v:obj) =
      
         use msw = 
             new System.IO.MemoryStream()
@@ -15,7 +15,7 @@ module Helpers =
         msw.ToArray()
 
 
-    let Deserialise (s:ISerde) (contentType:string option) (typeName:string) (bs:byte[]) =
+    let Deserialise (s:ISerde) (contentType:string) (typeName:string) (bs:byte[]) =
      
         use msr = 
             new System.IO.MemoryStream( bs )
@@ -26,7 +26,7 @@ module Helpers =
         s.Deserialise contentType typeName reader 
       
       
-    let DeserialiseT<'T when 'T :> ITypeSerialisable> (s:ISerde) (contentType:string option) (bs:byte[]) =
+    let DeserialiseT<'T when 'T :> ITypeSerialisable> (s:ISerde) (contentType:string) (bs:byte[]) =
      
         use msr = 
             new System.IO.MemoryStream( bs ) 
@@ -37,27 +37,27 @@ module Helpers =
         s.DeserialiseT<'T> contentType reader 
         
                       
-    let Wrap (serialiser:ISerde) (ts:ITypeSerialisable) (contentTypes:seq<string>) = 
+    let Wrap (serde:ISerde) (ts:ITypeSerialisable) (contentTypes:seq<string>) = 
     
-        let contentType =
+        let contentType, typeName =
          
             let picker (ct:string) = 
-                serialiser.TryLookupBySystemType (Some ct,ts.Type) |> Option.map ( fun _ -> ct )
+                serde.TryLookupBySystemType (ct,ts.Type) |> Option.map ( fun serde -> serde, ct )
                  
             match contentTypes |> Seq.tryPick picker with 
             | None -> 
                 failwithf "Unable to find a serialiser for '%O' for any of '%s'" (ts.Type) (contentTypes |> String.concat ",")
-            | Some contentType -> 
-                contentType
+            | Some (ts,contentType) -> 
+                contentType, ts.TypeName
                 
-        let typeName = 
-            serialiser.TypeName (Some contentType) (ts.Type) 
-                                
         let body = 
-            Serialise serialiser (Some contentType) ts 
+            Serialise serde contentType ts 
                                                   
-        TypeWrapper.Make( Some contentType, typeName, body )   
+        TypeWrapper.Make( contentType, Some typeName, body )   
         
-    let Unwrap (serialiser:ISerde) (tw:ITypeWrapper) = 
+    let Unwrap (serde:ISerde) (tw:ITypeWrapper) = 
     
-        Deserialise serialiser tw.ContentType tw.TypeName tw.Body          
+        if tw.TypeName.IsSome then 
+            Deserialise serde tw.ContentType tw.TypeName.Value tw.Body
+        else
+            failwithf "Unable to unwrap TypeWrapper that has no TypeName specified!"

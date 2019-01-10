@@ -81,3 +81,35 @@ with
         if item.Token <> JsonToken.String then
             failwithf "Expecting to read 'string' but saw [%O]" item.Token
         unbox<string>( item.Value )
+        
+    member this.Skip () =
+        
+        if  this.Peek().Token = JsonToken.StartObject
+         || this.Peek().Token = JsonToken.StartArray then 
+            
+            let openingToken =
+                this.Peek().Token
+                
+            let closingToken =
+                if openingToken = JsonToken.StartObject then JsonToken.EndObject else JsonToken.EndArray
+                
+            this.Read() |> ignore
+            
+            let nesting = ref 1
+            
+            //while (this.Peek().Token <> closingToken) && !nesting > 0 do
+            while !nesting > 0 do 
+            
+                if this.Peek().Token = openingToken then 
+                    System.Threading.Interlocked.Increment(nesting) |> ignore
+                elif this.Peek().Token = closingToken then
+                    System.Threading.Interlocked.Decrement(nesting) |> ignore
+                else
+                    ()
+                                        
+                this.Read() |> ignore
+                                    
+            //this.Read() |> ignore                        
+            
+        else
+            this.Read() |> ignore

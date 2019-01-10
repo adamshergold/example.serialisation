@@ -18,10 +18,10 @@ module Serialisers =
                     member this.ContentType 
                         with get () = "json" 
                                                 
-                    member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                    member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
                     
                         use js = 
-                            JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                            JsonSerialiser.Make( serde, stream, this.ContentType )
                                         
                         let typeToString () = 
                             match v with 
@@ -72,10 +72,10 @@ module Serialisers =
                         
                         js.WriteEndObject()
                 
-                    member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                    member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                     
                         use jds = 
-                            JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                            JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
                         
                         let reader = 
                             jds.Reader 

@@ -1,6 +1,6 @@
 namespace Example.Serialisation
 
-type TypeWrapper( contentType: string option, typeName: string, body: byte[] ) = 
+type TypeWrapper( contentType: string, typeName: string option, body: byte[] ) = 
 
     member val ContentType = contentType 
     
@@ -13,8 +13,8 @@ type TypeWrapper( contentType: string option, typeName: string, body: byte[] ) =
         
     override this.ToString () = 
         sprintf "TypeWrapper(%s,%s,%d)"
-            (match this.ContentType with | Some v -> v | None -> "-")
-            this.TypeName
+            this.ContentType
+            (match this.TypeName with | Some v -> v | None -> "-")
             this.Body.Length 
 
     interface ITypeWrapper

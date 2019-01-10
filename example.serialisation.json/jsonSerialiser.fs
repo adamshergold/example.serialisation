@@ -3,7 +3,7 @@ namespace Example.Serialisation.Json
 open Example.Serialisation
 open Newtonsoft.Json 
 
-type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string option ) = 
+type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string ) = 
 
     let wrapper = 
         JsonTextWriterStreamWrapper.Make(ss) 
@@ -16,7 +16,7 @@ type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string op
          
     
     static member Make( serialiser, ss, contentType ) = 
-        new JsonSerialiser( serialiser, ss, Some contentType )
+        new JsonSerialiser( serialiser, ss, contentType )
         
     member this.Dispose () =
         wrapper.Dispose()

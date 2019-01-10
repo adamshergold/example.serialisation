@@ -29,30 +29,30 @@ type BinaryProxy( wrapper: ITypeWrapper ) =
                     member this.ContentType = 
                         "binary" 
                                                     
-                    member this.Serialise (serialiser:ISerde) (s:ISerdeStream) (v:BinaryProxy) =
+                    member this.Serialise (serde:ISerde) (s:ISerdeStream) (v:BinaryProxy) =
 
                         use bw = 
                             Serde.BinaryWriter( s.Stream )
                         
-                        bw.Write( v.Wrapper.ContentType.IsSome ) 
-                        if v.Wrapper.ContentType.IsSome then 
-                            bw.Write( v.Wrapper.ContentType.Value )
-                            
-                        bw.Write( v.Wrapper.TypeName )
+                        bw.Write( v.Wrapper.ContentType ) 
+                        
+                        bw.Write( v.Wrapper.TypeName.IsSome )
+                        if v.Wrapper.TypeName.IsSome then 
+                            bw.Write( v.Wrapper.TypeName.Value )
                         
                         bw.Write( (int32) v.Wrapper.Body.Length ) 
                         bw.Write( v.Wrapper.Body )
                         
-                    member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
+                    member this.Deserialise (serde:ISerde) (s:ISerdeStream) =
                     
                         use br = 
                             Serde.BinaryReader( s.Stream ) 
                         
                         let contentType = 
-                            if br.ReadBoolean() then Some( br.ReadString() ) else None 
+                            br.ReadString() 
                             
                         let typeName = 
-                            br.ReadString()
+                            if br.ReadBoolean() then Some( br.ReadString() ) else None
                             
                         let body = 
                             br.ReadBytes( br.ReadInt32() )

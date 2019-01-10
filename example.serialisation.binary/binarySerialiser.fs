@@ -26,7 +26,7 @@ type BinarySerialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) 
         | :? bool as v -> bw.Write(v)
         | :? double as v -> bw.Write(v)
         | :? System.DateTime as v -> bw.Write(v.ToBinary())
-        | :? ITypeSerialisable as v -> serialiser.Serialise (Some "binary") streamWrapper v
+        | :? ITypeSerialisable as v -> serialiser.Serialise "binary" streamWrapper v
         | :? System.IConvertible as v -> bw.Write(v.ToString())
         | :? array<byte>  as v -> bw.Write(v)
         | _ -> failwithf "Unable to serialise object of type [%O]" (v.GetType())

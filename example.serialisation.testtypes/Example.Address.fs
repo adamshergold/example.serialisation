@@ -18,28 +18,22 @@ with
         }
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Address>
 
 module private Address_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Address>
+        { new ITypeSerde<Address>
             with
                 member this.TypeName =
                     "Example.Address"
 
-                member this.Type
-                    with get () = typeof<Address>
-
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
     
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     bs.Write( v.Number )
                     
@@ -47,10 +41,10 @@ module private Address_Serialisers =
                     
                     bs.Write( v.Region.ToString() )
                     
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+                        BinaryDeserialiser.Make( serde, stream, this.TypeName )
 
                     let _Number = 
                         bds.ReadInt32()
@@ -71,24 +65,21 @@ module private Address_Serialisers =
                     result }
                     
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Address>
+        { new ITypeSerde<Address>
             with
                 member this.TypeName =
                     "Example.Address"
 
-                member this.Type
-                    with get () = typeof<Address>
-
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     js.WriteProperty "Number"
@@ -102,10 +93,10 @@ module private Address_Serialisers =
                     
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
                     jds.Handlers.On "Number" ( jds.ReadInt32 )
                     jds.Handlers.On "Street" ( jds.ReadString )

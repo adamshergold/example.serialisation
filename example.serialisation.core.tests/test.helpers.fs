@@ -41,12 +41,12 @@ type HelpersShould( oh: ITestOutputHelper ) =
             Example.Serialisation.TestTypes.Extensions.Person.Examples.[0]
                        
         let bytes = 
-            p |> Helpers.Serialise serde (Some "json") 
+            p |> Helpers.Serialise serde "json" 
         
         Assert.True( bytes.Length > 0  )
 
         let p' =
-            Helpers.Deserialise serde (Some "json") "Example.Person" bytes
+            Helpers.Deserialise serde "json" "Example.Person" bytes
             
         Assert.Equal( p', p )
         
@@ -61,12 +61,12 @@ type HelpersShould( oh: ITestOutputHelper ) =
             Example.Serialisation.TestTypes.Extensions.Person.Examples.[0]
                        
         let bytes = 
-            p |> Helpers.Serialise serde (Some "json") 
+            p |> Helpers.Serialise serde "json" 
         
         Assert.True( bytes.Length > 0  )
 
         let p' =
-            Helpers.DeserialiseT<_> serde (Some "json") bytes
+            Helpers.DeserialiseT<_> serde "json" bytes
             
         Assert.Equal( p', p )    
         

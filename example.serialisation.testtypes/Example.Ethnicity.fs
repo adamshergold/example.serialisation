@@ -9,28 +9,22 @@ type Ethnicity =
     | SolarSystem of string 
 with
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Ethnicity>
 
 module private Ethnicity_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Ethnicity>
+        { new ITypeSerde<Ethnicity>
             with
                 member this.TypeName =
                     "Example.Ethnicity"
 
-                member this.Type
-                    with get () = typeof<Ethnicity>
-
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
     
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     match v with 
                     | Earthian -> 
@@ -39,10 +33,10 @@ module private Ethnicity_Serialisers =
                         bs.Write( "SolarSystem" )
                         bs.Write( v )
                         
-                member this.Deserialise (serialiser:ISerde) (s:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (s:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, s, this.TypeName )
+                        BinaryDeserialiser.Make( serde, s, this.TypeName )
 
                     match bds.ReadString() with
                     | _ as v when v = "Earthian" ->
@@ -55,24 +49,21 @@ module private Ethnicity_Serialisers =
                         failwithf "Unexpected union case seen when deserialising Ethnicity: '%s'" v } 
                         
     let JSON_Serialiser =
-        { new ITypeSerialiser<Ethnicity>
+        { new ITypeSerde<Ethnicity>
             with
                 member this.TypeName =
                     "Example.Ethnicity"
 
-                member this.Type
-                    with get () = typeof<Ethnicity>
-
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     match v with
@@ -85,10 +76,10 @@ module private Ethnicity_Serialisers =
 
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
                     jds.Handlers.On "Earthian" ( jds.ReadNull )
                     jds.Handlers.On "SolarSystem" ( jds.ReadString )

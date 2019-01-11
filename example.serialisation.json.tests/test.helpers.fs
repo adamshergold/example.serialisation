@@ -5,6 +5,7 @@ open Microsoft.Extensions.Logging
 open Xunit
 open Xunit.Abstractions 
 
+open System
 open Example.Serialisation.Json
 open Example.Serialisation
 

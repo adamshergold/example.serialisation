@@ -24,11 +24,37 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
         use sut =
             
             let wrapper =
-                TypeWrapper.Make( Some "json", "test", Array.empty )
+                TypeWrapper.Make( "json", Some "test", Array.empty )
                 
             JsonProxy.Make( wrapper )
         
         Assert.True( true )
+
+    [<Fact>]
+    member this.``CanHandleNestedThings`` () =
+        
+        let json = "{\"foo\":{\"bar\":123}}"
+        logger.LogInformation( "[{JSON}]", json )
+        
+        let encJson = json |> System.Text.Encoding.UTF8.GetBytes
+        logger.LogInformation( "[{envJSON}]", encJson )
+        
+        let serde =
+            Serde.Make( SerdeOptions.Default )
+            
+        Assert.True( serde.TryRegister JsonProxy.JsonSerialiser |> Option.isSome )
+        
+        let v =
+            Helpers.FromJson<JsonProxy> serde json
+        
+        logger.LogInformation( "[{encRTJSON}]", v.Wrapper.Body )
+        
+        let rtJson =
+            v.Wrapper.Body |> System.Text.Encoding.UTF8.GetString
+                    
+        logger.LogInformation( "[{RTJSON}]", rtJson )
+        
+        Assert.Equal( json, rtJson, System.StringComparer.Ordinal ) 
 
     [<Fact>]
     member this.``SerialiseDeserialise-BinaryProxy`` () =
@@ -38,7 +64,7 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
             let wrapper =
                 let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
                 let body = json |> System.Text.Encoding.UTF8.GetBytes
-                TypeWrapper.Make( Some "json", "JsonProxy", body )
+                TypeWrapper.Make( "json", Some "JsonProxy", body )
             
             JsonProxy.Make( wrapper )
         
@@ -77,7 +103,7 @@ type JsonProxyShould( oh: ITestOutputHelper ) =
             let wrapper =
                 let json = "{ \"@type\" : \"foo\", \"name\" : \"john\" }"
                 let body = json |> System.Text.Encoding.UTF8.GetBytes
-                TypeWrapper.Make( Some "json", "foo", body )
+                TypeWrapper.Make( "json", Some "foo", body )
             
             JsonProxy.Make( wrapper )
         

@@ -37,8 +37,5 @@ with
             | Map(v) -> box(v)
             
     interface ITypeSerialisable
-        with 
-            member this.Type 
-                with get () = typeof<Any>
 
 

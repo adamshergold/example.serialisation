@@ -16,28 +16,22 @@ with
         }
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Phone>
 
 module private Phone_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Phone>
+        { new ITypeSerde<Phone>
             with
                 member this.TypeName =
                     "Example.Phone"
 
-                member this.Type
-                    with get () = typeof<Phone>
-
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
     
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     bs.Write( v.Code.IsSome ) 
                     if v.Code.IsSome then 
@@ -46,10 +40,10 @@ module private Phone_Serialisers =
                     bs.Write( (int32) v.Digits.Length )
                     v.Digits |> Seq.iter bs.Write
                         
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+                        BinaryDeserialiser.Make( serde, stream, this.TypeName )
 
                     let _Code = 
                         if bds.ReadBool() then 
@@ -69,24 +63,21 @@ module private Phone_Serialisers =
                     result }
                                                   
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Phone>
+        { new ITypeSerde<Phone>
             with
                 member this.TypeName =
                     "Example.Phone"
 
-                member this.Type
-                    with get () = typeof<Phone>
-
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     if v.Code.IsSome then
@@ -100,10 +91,10 @@ module private Phone_Serialisers =
                     
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
                     jds.Handlers.On "Code" ( jds.ReadString )
                     jds.Handlers.On "Digits" ( jds.ReadArray<int32>( jds.ReadInt32 ) )

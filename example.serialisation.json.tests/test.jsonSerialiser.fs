@@ -5,6 +5,8 @@ open Microsoft.Extensions.Logging
 open Xunit
 open Xunit.Abstractions 
 
+open Example.Serialisation.TestTypes
+
 open Example.Serialisation.Json
 open Example.Serialisation
 
@@ -18,6 +20,11 @@ type JsonSerialiserShould( oh: ITestOutputHelper ) =
             
         Logging.CreateLogger options
 
+    let sut options =
+        let sut = Serde.Make( options )
+        sut.TryRegisterAssembly typeof<Example.Address>.Assembly |> ignore
+        sut
+        
     [<Fact>]
     member this.``BeCreateable`` () =
         
@@ -33,6 +40,28 @@ type JsonSerialiserShould( oh: ITestOutputHelper ) =
         
         Assert.True( true )
 
+    [<Fact>]
+    member this.``CanUseDifferentTypeProperties`` () =
+        
+        let options = {
+            SerdeOptions.Default
+                with TypeProperty = "_type"
+            }
+
+        let sut = sut options            
+            
+        let v =
+            Example.Address.Make( 1, "High Street", Example.Region.North )
+            
+        let json = Helpers.ToJson sut v
+        
+        logger.LogInformation( "{JSON}", json )
+                               
+        Assert.Contains( "_type", json )
+        
+        let rt = json |> Helpers.FromJson sut
+        
+        Assert.Equal( v, rt )
 
 
 

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="utilities.fs" />
     <Compile Include="peekreader.fs" />
     <Compile Include="propertyhandler.fs" />
     <Compile Include="jsonPeekReaderStreamWrapper.fs" />

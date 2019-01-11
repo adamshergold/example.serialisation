@@ -2,12 +2,10 @@ namespace Example.Serialisation.Json
 
 open Newtonsoft.Json
 
+open System
 open Example.Serialisation
              
-type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : string option, typeName: string ) = 
-
-    let handlers = 
-        PropertyHandler.Make()
+type JsonDeserialiser( serde: ISerde, stream: ISerdeStream, contentType : string, typeName: string ) = 
 
     let wrapper = 
         JsonPeekReaderStreamWrapper.Make(stream) 
@@ -15,15 +13,20 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
     let reader = 
         wrapper.Reader 
 
+    let handlers = 
+        PropertyHandler.Make( reader, serde.Options.PropertyNameStringComparison )
+    
     member val Handlers = handlers 
                   
     member val Reader = reader 
                       
     static member Make( serialiser, stream, contentType, typeName ) = 
-        new JsonDeserialiser( serialiser, stream, Some contentType, typeName )
+        new JsonDeserialiser( serialiser, stream, contentType, typeName )
 
     member this.Dispose () = 
         wrapper.Dispose()
+        handlers.Dispose()
+        reader.Dispose()
 
     member this.ReadString () = 
         System.Convert.ToString( reader.Read().Value ) :> obj
@@ -53,25 +56,34 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
         null :> obj
 
     member this.InferType () =
-        if reader.PeekTokenAt(0) = JsonToken.StartObject &&
-            reader.PeekTokenAt(1) = JsonToken.PropertyName then 
-                let propertyV = reader.PeekAt(1).Value.ToString()
-                if propertyV = "@type" then
-                    let inlineTypeName = 
-                        unbox<string>(reader.PeekAt(2).Value)
-                    match serialiser.TryLookupByTypeName (contentType,inlineTypeName) with 
-                    | Some _ -> Some inlineTypeName
-                    | None -> Some "JsonProxy"
-                else if propertyV = "@any" then
-                    Some "Any"
-                else
-                    None
+        if  reader.PeekTokenAt(0) = JsonToken.StartObject
+         && reader.PeekTokenAt(1) = JsonToken.PropertyName then
+                
+            let propertyV =
+                reader.PeekAt(1).Value.ToString()
+            
+            if  ( serde.Options.AllowableTypeProperties.IsNone && propertyV.Equals( serde.Options.TypeProperty, System.StringComparison.Ordinal ) )
+             || ( serde.Options.AllowableTypeProperties.IsSome && serde.Options.AllowableTypeProperties.Value.Contains( propertyV ) ) then
+                
+                let inlineTypeName =
+                    unbox<string>(reader.PeekAt(2).Value)
+                    
+                match serde.TrySerdeByTypeName (contentType,inlineTypeName) with 
+                | Some _ ->
+                    Some inlineTypeName
+                | None ->
+                    Some "JsonProxy"
+                
+            else if propertyV = "@any" then
+                Some "Any"
+            else
+                None
         else 
             None
 
     member this.ReadAny = 
         fun () ->   
-            serialiser.Deserialise contentType "Any" wrapper 
+            serde.Deserialise contentType "Any" wrapper 
             
     member this.ReadSerialisable = 
         fun () ->   
@@ -81,7 +93,7 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
         fun () ->
             match this.InferType() with 
             | Some typeName -> 
-                serialiser.Deserialise contentType typeName wrapper
+                serde.Deserialise contentType typeName wrapper
             | None ->
                 failwithf "Unable to infer type name when attempting to ReadRecord(%s)" typeName
                                   
@@ -91,7 +103,7 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
             if reader.PeekTokenAt(0) = JsonToken.StartObject &&
                reader.PeekTokenAt(1) = JsonToken.PropertyName then 
                 let inlineTypeName = unbox<string>(reader.PeekAt(2).Value)
-                serialiser.Deserialise contentType inlineTypeName wrapper 
+                serde.Deserialise contentType inlineTypeName wrapper 
             else 
                 failwithf "Unexpected token stream for an interface!"
 
@@ -99,7 +111,7 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
         fun () ->
             match this.InferType() with 
             | Some typeName -> 
-                serialiser.Deserialise contentType typeName wrapper
+                serde.Deserialise contentType typeName wrapper
             | None ->
                 failwithf "Unable to infer type name when attempting to ReadUnion" 
 
@@ -107,7 +119,7 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
         fun () ->
             match this.InferType() with 
             | Some typeName -> 
-                serialiser.Deserialise contentType typeName wrapper
+                serde.Deserialise contentType typeName wrapper
             | None ->
                 failwithf "Unable to infer type name when attempting to ReadRecord" 
                             
@@ -115,7 +127,7 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
         fun () ->
             match this.InferType() with 
             | Some typeName -> 
-                serialiser.Deserialise contentType typeName wrapper
+                serde.Deserialise contentType typeName wrapper
             | None ->
                 failwithf "Unable to infer type name when attempting to ReadUnion" 
 
@@ -167,15 +179,22 @@ type JsonDeserialiser( serialiser: ISerde, stream: ISerdeStream, contentType : s
     member this.Deserialise () = 
 
         reader.ReadToken JsonToken.StartObject 
-          
-        let property = 
-            reader.ReadProperty()
+
+        if serde.Options.StrictInlineTypeCheck then
             
-        let inlineTypeName = 
-            reader.ReadString()
-            
-        if inlineTypeName <> typeName then 
-            failwithf "Attempted to deserialise [%s] but expecting [%s]" inlineTypeName typeName
+            if  ( reader.PeekTokenAt(0) = JsonToken.PropertyName )
+             && ( reader.PeekAt(0).Value.ToString().Equals( serde.Options.TypeProperty, StringComparison.Ordinal ) ) then
+
+                let _ =
+                    reader.ReadProperty()
+                
+                let inlineTypeName =
+                    unbox<string>( reader.ReadString() )
+
+                if inlineTypeName <> typeName then  
+                    failwithf "Attempted to deserialise [%s] but expecting [%s]" inlineTypeName typeName
+            else
+                failwithf "Strict in-line type checking expects '%s' to be first property" serde.Options.TypeProperty
           
         while reader.PeekAt(0).Token <> JsonToken.EndObject do
             let propertyName = reader.ReadProperty()        

@@ -22,7 +22,7 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
                 
     member val TypeName = typeName 
             
-    member val ContentType = Some "binary"
+    member val ContentType = "binary"
         
     static member Make( serialiser, ss, typeName ) = 
         new BinaryDeserialiser( serialiser, ss, typeName )
@@ -72,32 +72,34 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
         let inlineTypeName = 
             wrapper.PeekString()
                   
-        match serialiser.TryLookupByTypeName (this.ContentType, inlineTypeName) with
+        match serialiser.TrySerdeByTypeName (this.ContentType, inlineTypeName) with
         | Some serialiser -> 
             inlineTypeName
         | None ->
             BinaryProxy.TypeName
-            //TypeWrapper.TypeName
           
     member this.ReadSerialisable () =
         match box(this.ReadRecord None) with
         | :? ITypeSerialisable as ts -> 
             match ts with 
             | :? ITypeWrapper as tw ->
-                match serialiser.TryLookupByTypeName (tw.ContentType,tw.TypeName) with 
-                | Some typeSerialiser ->
-                    use ms = 
-                        new System.IO.MemoryStream( tw.Body ) 
-                        
-                    use stream =
-                        SerdeStreamWrapper.Make( ms )
-                        
-                    match serialiser.Deserialise tw.ContentType tw.TypeName stream with 
-                    | :? ITypeSerialisable as ts ->
+                if tw.TypeName.IsSome then 
+                    match serialiser.TrySerdeByTypeName (tw.ContentType,tw.TypeName.Value) with 
+                    | Some typeSerialiser ->
+                        use ms = 
+                            new System.IO.MemoryStream( tw.Body ) 
+                            
+                        use stream =
+                            SerdeStreamWrapper.Make( ms )
+                            
+                        match serialiser.Deserialise tw.ContentType tw.TypeName.Value stream with 
+                        | :? ITypeSerialisable as ts ->
+                            ts
+                        | _ -> 
+                            failwithf "Deserialised item did not implement ITypeSerialisable"
+                    | None ->    
                         ts
-                    | _ -> 
-                        failwithf "Deserialised item did not implement ITypeSerialisable"
-                | None ->    
+                else
                     ts
             | _ -> 
                 ts 

@@ -9,36 +9,43 @@ with
     static member Make(  ) =
         new Empty()
 
-    interface ITypeSerialisable
+    override this.Equals (other:obj) =
+        (this:>System.IComparable).CompareTo(other).Equals(0)
+    
+    override this.GetHashCode() =
+        0
+        
+    interface System.IComparable
         with
-            member this.Type
-                with get () = typeof<Empty>
+            member this.CompareTo (other:obj) =
+                match other with
+                | :? Empty -> 0
+                | _ -> failwithf "Cannot compare Empty to '%O'" other
+                
+    interface ITypeSerialisable
 
 module private Empty_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Empty>
+        { new ITypeSerde<Empty>
             with
                 member this.TypeName =
                     "Example.Empty"
 
-                member this.Type
-                    with get () = typeof<Empty>
-
                 member this.ContentType
                     with get () = "binary"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
     
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
                         
                     ()    
                     
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                                         
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+                        BinaryDeserialiser.Make( serde, stream, this.TypeName )
 
                     let result = 
                         new Empty()
@@ -46,32 +53,29 @@ module private Empty_Serialisers =
                     result }
                     
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Empty>
+        { new ITypeSerde<Empty>
             with
                 member this.TypeName =
                     "Example.Empty"
 
-                member this.Type
-                    with get () = typeof<Empty>
-
                 member this.ContentType
                     with get () = "json"
 
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
 
                     use js =
-                        JsonSerialiser.Make( serialiser, stream, this.ContentType )
+                        JsonSerialiser.Make( serde, stream, this.ContentType )
 
                     js.WriteStartObject()
-                    js.WriteProperty "@type"
+                    js.WriteProperty serde.Options.TypeProperty
                     js.WriteValue this.TypeName
 
                     js.WriteEndObject()
 
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
 
                     use jds =
-                        JsonDeserialiser.Make( serialiser, stream, this.ContentType, this.TypeName )
+                        JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
 
                     jds.Deserialise()

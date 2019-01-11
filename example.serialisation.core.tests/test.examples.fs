@@ -22,24 +22,6 @@ type ExamplesShould( oh: ITestOutputHelper ) =
             
         Logging.CreateLogger options
 
-    let roundTrip (serialiser:ISerde) (typeName:string) (v:obj) = 
-    
-        use msw = 
-            new System.IO.MemoryStream()
-                    
-        use writeStream = 
-            SerdeStreamWrapper.Make( msw )            
-                    
-        v |> serialiser.Serialise None writeStream
-
-        use msr = 
-            new System.IO.MemoryStream( msw.ToArray() )
-            
-        use readStream = 
-            SerdeStreamWrapper.Make( msr )            
-        
-        serialiser.Deserialise None typeName readStream 
-
     let sut = 
     
         let sut = 
@@ -100,6 +82,16 @@ type ExamplesShould( oh: ITestOutputHelper ) =
                 |> Seq.map ( fun v ->
                     [| box(ct); box("Example.MyAny"); box(v) |] )
 
+            let myEmpties (ct:string) = 
+                Example.Serialisation.TestTypes.Extensions.Empty.Examples
+                |> Seq.map ( fun v ->
+                    [| box(ct); box("Example.Empty"); box(v) |] )
+
+            let myAlls (ct:string) = 
+                Example.Serialisation.TestTypes.Extensions.All.Examples
+                |> Seq.map ( fun v ->
+                    [| box(ct); box("Example.All"); box(v) |] )
+                        
             seq {
                 yield! (addresses "json")
                 yield! (addresses "binary")
@@ -124,6 +116,13 @@ type ExamplesShould( oh: ITestOutputHelper ) =
 
                 yield! (myAnys "json")
                 yield! (myAnys "binary")
+
+                yield! (myEmpties "json")
+                yield! (myEmpties "binary")
+
+                yield! (myAlls "json")
+                yield! (myAlls "binary")
+
             }
                              
     [<Theory>]
@@ -133,12 +132,12 @@ type ExamplesShould( oh: ITestOutputHelper ) =
         let sut = sut()
 
         let bytes = 
-            Helpers.Serialise sut (Some contentType) v
+            Helpers.Serialise sut contentType v
           
         logger.LogInformation( "{ContentType} nBytes {Bytes}", contentType, bytes.Length )
                     
         let rt = 
-            Helpers.Deserialise sut (Some contentType) typeName bytes 
+            Helpers.Deserialise sut contentType typeName bytes 
                     
         Assert.Equal( v, rt )            
         

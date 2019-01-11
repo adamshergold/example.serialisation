@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    
+    <Compile Include="options.fs" />    
     <Compile Include="interfaces.fs" />
     <Compile Include="typeWrapper.fs" />
     <Compile Include="serde.fs" />

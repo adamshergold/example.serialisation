@@ -5,21 +5,21 @@ open Example.Serialisation
 module Serialisers =
     
     let AnyBinarySerialiser = 
-        { new ITypeSerialiser<Any> 
+        { new ITypeSerde<Any> 
             with 
                 member this.TypeName =
                     "Any"
 
-                member this.Type 
-                    with get () = typeof<Any>
+//                member this.Type 
+//                    with get () = typeof<Any>
 
                 member this.ContentType 
                     with get () = "binary" 
                                             
-                member this.Serialise (serialiser:ISerde) (stream:ISerdeStream) v =
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
                 
                     use bs = 
-                        BinarySerialiser.Make( serialiser, stream, this.TypeName )
+                        BinarySerialiser.Make( serde, stream, this.TypeName )
 
                     let rec impl (iv:Any) =                                        
                         match iv with 
@@ -58,10 +58,10 @@ module Serialisers =
                    
                     impl v
                     
-                member this.Deserialise (serialiser:ISerde) (stream:ISerdeStream) =
+                member this.Deserialise (serde:ISerde) (stream:ISerdeStream) =
                 
                     use bds = 
-                        BinaryDeserialiser.Make( serialiser, stream, this.TypeName )
+                        BinaryDeserialiser.Make( serde, stream, this.TypeName )
                     
                     let rec impl () =
                         match bds.ReadInt8() with

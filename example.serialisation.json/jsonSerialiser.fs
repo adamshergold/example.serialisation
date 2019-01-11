@@ -24,9 +24,6 @@ type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string ) 
     member this.WriteProperty propertyName = 
         writer.WritePropertyName propertyName
     
-    member this.WriteToken (token:JsonToken,value:obj) =
-        writer.WriteToken( token, value )
-        
     member this.WriteValue (v:obj) = 
         writer.WriteValue v 
 
@@ -47,17 +44,6 @@ type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string ) 
        
     member this.Serialise (v:obj) = 
         
-        let implements (want:System.Type) (t:System.Type) = 
-            t.GetInterfaces() |> Seq.exists ( fun it -> it = want )
-            
-        let normaliseType (t:System.Type) = 
-            if Microsoft.FSharp.Reflection.FSharpType.IsUnion t then
-                let cases = 
-                    Microsoft.FSharp.Reflection.FSharpType.GetUnionCases t
-                if cases.Length = 0 then t else cases.[0].DeclaringType 
-            else 
-                t
-
         if v = null then 
             writer.WriteNull()
         else 

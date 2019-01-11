@@ -5,6 +5,7 @@ open System.Collections
 open Newtonsoft.Json 
 
 type IPropertyHandler =
+    inherit System.IDisposable
     abstract On : string -> ( unit -> obj ) -> unit
     abstract Handle : string -> unit 
     abstract Has : string -> bool
@@ -42,10 +43,10 @@ with
     member this.On (property:string) (cb:unit->obj) =
         cbs.Add( property, cb )
         
-    member this.For (property:string) = 
-        match cbs.TryGetValue property with
-        | false, _ -> None
-        | true, cb -> Some cb
+//    member this.For (property:string) = 
+//        match cbs.TryGetValue property with
+//        | false, _ -> None
+//        | true, cb -> Some cb
         
     member this.TryItem<'T> property =
         match items.TryGetValue property with

@@ -17,6 +17,32 @@ with
 
 module private All_Serialisers = 
 
+    let Binary_Serialiser = 
+        { new ITypeSerde<All>
+            with
+                member this.TypeName =
+                    "Example.All"
+
+                member this.ContentType
+                    with get () = "binary"
+
+                member this.Serialise (serde:ISerde) (stream:ISerdeStream) v =
+    
+                    use bs = 
+                        BinarySerialiser.Make( serde,  stream, this.TypeName )
+                    
+                    bs.Write( v.TheSerialisable ) 
+                    
+                member this.Deserialise (serde:ISerde) (s:ISerdeStream) =
+                                        
+                    use bds = 
+                        BinaryDeserialiser.Make( serde, s, this.TypeName )
+                    
+                    let theSerialisable = 
+                        bds.ReadSerialisable()
+                        
+                    All.Make( theSerialisable ) }
+        
     let JSON_Serialiser = 
         { new ITypeSerde<All>
             with
@@ -58,4 +84,6 @@ module private All_Serialisers =
 
 type All with
 
+    static member Binary_Serialiser = All_Serialisers.Binary_Serialiser
+    
     static member JSON_Serialiser = All_Serialisers.JSON_Serialiser

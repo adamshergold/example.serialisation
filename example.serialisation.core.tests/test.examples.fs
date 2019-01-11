@@ -82,6 +82,16 @@ type ExamplesShould( oh: ITestOutputHelper ) =
                 |> Seq.map ( fun v ->
                     [| box(ct); box("Example.MyAny"); box(v) |] )
 
+            let myEmpties (ct:string) = 
+                Example.Serialisation.TestTypes.Extensions.Empty.Examples
+                |> Seq.map ( fun v ->
+                    [| box(ct); box("Example.Empty"); box(v) |] )
+
+            let myAlls (ct:string) = 
+                Example.Serialisation.TestTypes.Extensions.All.Examples
+                |> Seq.map ( fun v ->
+                    [| box(ct); box("Example.All"); box(v) |] )
+                        
             seq {
                 yield! (addresses "json")
                 yield! (addresses "binary")
@@ -106,6 +116,13 @@ type ExamplesShould( oh: ITestOutputHelper ) =
 
                 yield! (myAnys "json")
                 yield! (myAnys "binary")
+
+                yield! (myEmpties "json")
+                yield! (myEmpties "binary")
+
+                yield! (myAlls "json")
+                yield! (myAlls "binary")
+
             }
                              
     [<Theory>]

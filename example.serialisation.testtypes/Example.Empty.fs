@@ -9,6 +9,19 @@ with
     static member Make(  ) =
         new Empty()
 
+    override this.Equals (other:obj) =
+        (this:>System.IComparable).CompareTo(other).Equals(0)
+    
+    override this.GetHashCode() =
+        0
+        
+    interface System.IComparable
+        with
+            member this.CompareTo (other:obj) =
+                match other with
+                | :? Empty -> 0
+                | _ -> failwithf "Cannot compare Empty to '%O'" other
+                
     interface ITypeSerialisable
 
 module private Empty_Serialisers = 

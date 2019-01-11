@@ -26,7 +26,22 @@ type AnyShould( oh: ITestOutputHelper ) =
     member this.``Createable-String`` () =
         
         let v = "Hello"
+        Assert.Equal( Any.Make( v ).Value, v )
         
-        let sut = Any.Make( v )
-            
-        Assert.Equal( sut.Value, v )            
+    [<Fact>]
+    member this.``Createable-Int32`` () =
+        
+        let v = 123
+        Assert.Equal( Any.Make( v ).Value, v )
+        
+    [<Fact>]
+    member this.``Createable-Int64`` () =
+        
+        let v = 123L
+        Assert.Equal( Any.Make( v ).Value, v )
+        
+    [<Fact>]
+    member this.``Createable-Double`` () =
+        
+        let v = 123.456
+        Assert.Equal( Any.Make( v ).Value, v )                                                

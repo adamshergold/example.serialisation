@@ -2,6 +2,7 @@ namespace Example.Serialisation
 
 open Microsoft.Extensions.Logging
 
+[<System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute>]
 type SerdeOptions = {
     Logger : ILogger option
 

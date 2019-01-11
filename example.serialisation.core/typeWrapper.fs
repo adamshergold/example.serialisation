@@ -26,7 +26,5 @@ type TypeWrapper( contentType: string, typeName: string option, body: byte[] ) =
             member this.Body = this.Body 
            
     interface ITypeSerialisable
-        with 
-            member this.Type with get () = typeof<TypeWrapper>
 
               

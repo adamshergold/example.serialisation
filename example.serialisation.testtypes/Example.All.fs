@@ -14,20 +14,14 @@ with
         }
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<All>
 
 module private All_Serialisers = 
 
     let JSON_Serialiser = 
-        { new ITypeSerialiser<All>
+        { new ITypeSerde<All>
             with
                 member this.TypeName =
                     "Example.All"
-
-                member this.Type
-                    with get () = typeof<All>
 
                 member this.ContentType
                     with get () = "json"

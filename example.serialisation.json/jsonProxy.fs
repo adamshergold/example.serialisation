@@ -8,7 +8,7 @@ open Example.Serialisation.Binary
 
 
 [<AutoOpen>]
-module JsonProxyImpl = 
+module private JsonProxyImpl = 
 
     let ToBase64 (v:byte[]) =
         System.Convert.ToBase64String(v).TrimEnd('=').Replace('+','-').Replace('/','_')
@@ -32,9 +32,6 @@ with
         ()
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<JsonProxy> 
                 
     interface System.IDisposable
         with
@@ -54,14 +51,11 @@ with
                     
     static member BinarySerialiser 
         with get () =   
-            { new ITypeSerialiser<JsonProxy> 
+            { new ITypeSerde<JsonProxy> 
                 with 
                     member this.TypeName =
                         "JsonProxy"
 
-                    member this.Type
-                        with get () = typeof<JsonProxy> 
-    
                     member this.ContentType 
                         with get () = "binary" 
                                                 
@@ -101,13 +95,13 @@ with
                         
     static member JsonSerialiser 
         with get () =   
-            { new ITypeSerialiser<JsonProxy> 
+            { new ITypeSerde<JsonProxy> 
                 with 
                     member this.TypeName =
                         "JsonProxy"
 
-                    member this.Type
-                        with get () = typeof<JsonProxy> 
+//                    member this.Type
+//                        with get () = typeof<JsonProxy> 
     
                     member this.ContentType 
                         with get () = "json" 
@@ -195,7 +189,6 @@ with
                                 
                                 tokens.Add( reader.Read() )
                                 
-                                //while (reader.Peek().Token <> JsonToken.EndObject) && !nesting > 0 do
                                 while !nesting > 0 do
                                     
                                     if reader.Peek().Token = JsonToken.StartObject then 
@@ -207,8 +200,6 @@ with
                                         
                                     tokens.Add( reader.Read() )
                                     
-                                //tokens.Add( reader.Read() )   
-                                         
                                 let body = 
                                     
                                     use ms = 

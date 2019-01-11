@@ -9,20 +9,14 @@ type UnionOfPersons =
     | Persons of Example.Serialisation.TestTypes.Example.Person[] 
 with
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<UnionOfPersons>
 
 module private UnionOfPersons_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<UnionOfPersons>
+        { new ITypeSerde<UnionOfPersons>
             with
                 member this.TypeName =
                     "Example.UnionOfPersons"
-
-                member this.Type
-                    with get () = typeof<UnionOfPersons>
 
                 member this.ContentType
                     with get () = "binary"
@@ -56,13 +50,10 @@ module private UnionOfPersons_Serialisers =
                         failwithf "Unexpected union case seen when deserialising UnionOfPersons: '%s'" v } 
                     
     let JSON_Serialiser =
-        { new ITypeSerialiser<UnionOfPersons>
+        { new ITypeSerde<UnionOfPersons>
             with
                 member this.TypeName =
                     "Example.UnionOfPersons"
-
-                member this.Type
-                    with get () = typeof<UnionOfPersons>
 
                 member this.ContentType
                     with get () = "json"

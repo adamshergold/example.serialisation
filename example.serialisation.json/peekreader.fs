@@ -97,7 +97,6 @@ with
             
             let nesting = ref 1
             
-            //while (this.Peek().Token <> closingToken) && !nesting > 0 do
             while !nesting > 0 do 
             
                 if this.Peek().Token = openingToken then 
@@ -108,8 +107,6 @@ with
                     ()
                                         
                 this.Read() |> ignore
-                                    
-            //this.Read() |> ignore                        
             
         else
             this.Read() |> ignore

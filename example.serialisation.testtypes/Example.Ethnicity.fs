@@ -9,20 +9,14 @@ type Ethnicity =
     | SolarSystem of string 
 with
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Ethnicity>
 
 module private Ethnicity_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Ethnicity>
+        { new ITypeSerde<Ethnicity>
             with
                 member this.TypeName =
                     "Example.Ethnicity"
-
-                member this.Type
-                    with get () = typeof<Ethnicity>
 
                 member this.ContentType
                     with get () = "binary"
@@ -55,13 +49,10 @@ module private Ethnicity_Serialisers =
                         failwithf "Unexpected union case seen when deserialising Ethnicity: '%s'" v } 
                         
     let JSON_Serialiser =
-        { new ITypeSerialiser<Ethnicity>
+        { new ITypeSerde<Ethnicity>
             with
                 member this.TypeName =
                     "Example.Ethnicity"
-
-                member this.Type
-                    with get () = typeof<Ethnicity>
 
                 member this.ContentType
                     with get () = "json"

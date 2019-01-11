@@ -9,7 +9,7 @@ module private SerdeImpl =
     type CacheItem = {
         Serialiser        : ISerde
         LocalType         : System.Type
-        TypeSerialiser    : ITypeSerialiser
+        TypeSerialiser    : ITypeSerde
         SerialiseMethod   : System.Reflection.MethodInfo
         DeserialiseMethod : System.Reflection.MethodInfo 
     }
@@ -98,6 +98,9 @@ type Serde( options: SerdeOptions ) =
         | false, _ -> 
             None                  
 
+    let tryLookupTypeName (localType:System.Type) =
+        None
+        
     member val Options = options
     
     static member BinaryWriter (s:System.IO.Stream) = 
@@ -124,40 +127,40 @@ type Serde( options: SerdeOptions ) =
         
         lock this ( fun () ->
             match v with 
-            | :? ITypeSerialiser as serialiser ->
+            | :? ITypeSerde as serialiser ->
                 
-                let inputType = 
-                    serialiser.GetType() 
+                let concreteType =
+                    serialiser.GetType()
                     
-                let ifaces = 
-                    inputType.GetInterfaces()
+                let concreteInterfaces = 
+                    concreteType.GetInterfaces()
                     
-                let finder (it:System.Type) = 
-                    if it.IsGenericType && it.Name.StartsWith("ITypeSerialiser") then    
-                        let ga = it.GetGenericArguments()
-                        if ga.Length = 1 then Some it else None
+                let picker (ifaceType:System.Type) = 
+                    if ifaceType.IsGenericType && ifaceType.Name.StartsWith("ITypeSerde") then    
+                        let ga = ifaceType.GetGenericArguments()
+                        if ga.Length = 1 then Some ifaceType else None
                     else 
                         None              
             
-                let result = 
-                    ifaces |> Seq.tryPick finder 
+                let genericTypeSerialiserInterface = 
+                    concreteInterfaces |> Seq.tryPick picker 
                     
-                if result.IsSome then
+                if genericTypeSerialiserInterface.IsSome then
                 
-                    let typedSerialiser =
-                        result.Value
+                    let genericSerialiser =
+                        genericTypeSerialiserInterface.Value
                           
                     let sm = 
-                        typedSerialiser.GetMethod("Serialise")
+                        genericSerialiser.GetMethod("Serialise")
                     
                     let dm = 
-                        typedSerialiser.GetMethod("Deserialise")
+                        genericSerialiser.GetMethod("Deserialise")
                                     
-                    let localType =     
-                        serialiser.Type 
+                    let serialisesType =
+                        genericSerialiser.GetGenericArguments().[0]
                                                             
                     let ci = 
-                        CacheItem.Make( this, localType, serialiser, sm, dm) 
+                        CacheItem.Make( this, serialisesType, serialiser, sm, dm) 
 
                     if itemsBySystemType.ContainsKey( ci.LocalType ) then 
                         itemsBySystemType.Item( ci.LocalType ).Add( ci ) 
@@ -183,7 +186,7 @@ type Serde( options: SerdeOptions ) =
                     let pt = 
                         pi.PropertyType
                         
-                    if pt.IsGenericType && pt.Name.StartsWith("ITypeSerialiser") then 
+                    if pt.IsGenericType && pt.Name.StartsWith("ITypeSerde") then 
                         Some pi
                     else 
                         None 
@@ -194,29 +197,26 @@ type Serde( options: SerdeOptions ) =
                     |> Seq.choose ( fun x -> x )
                     |> Array.ofSeq
                     
-                let typeSerialisers = 
+                let nRegistered =
                     serialisers 
-                    |> Seq.map ( fun pi ->
+                    |> Seq.fold ( fun acc pi ->
                         let serialiser = pi.GetValue(null,null)
-                        this.TryRegister serialiser )
+                        let result = this.TryRegister serialiser
+                        acc + if result.IsSome then 1 else 0 ) 0 
                     
-                typeSerialisers
-                |> Seq.choose ( fun tso -> tso ) 
-                |> Seq.iter ( fun (ts:ITypeSerialiser) ->
-                    if options.Logger.IsSome then 
-                        options.Logger.Value.LogTrace( "Serialiser::TryRegisterAssembly - Added {TypeName} / {ContentType} / {SystemType}", ts.TypeName, ts.ContentType, ts.Type ) )
-                                         
-                serialisers |> Seq.length )                    
-
+                nRegistered )
+            
         candidates |> Seq.fold ( fun acc v -> acc + v ) 0 
                     
-    member this.TryLookupBySystemType (contentType:string) (t:System.Type) =
+    member this.TrySerdeBySystemType (contentType:string) (t:System.Type) =
         tryLookupBySystemType (contentType,t) |> Option.map ( fun ci -> ci.TypeSerialiser )
 
-    member this.TryLookupByTypeName (contentType:string) (typeName:string) =
+    member this.TrySerdeByTypeName (contentType:string) (typeName:string) =
         tryLookupByTypeName (contentType,typeName) |> Option.map ( fun ci -> ci.TypeSerialiser )
 
-                            
+    member this.TryLookupTypeName (localType:System.Type) =
+        tryLookupTypeName localType
+                                
     member this.Serialise (contentType:string) (s:ISerdeStream) (v:obj) =
         let nt = normaliseType (v.GetType())
         match itemsBySystemType.TryGetValue( nt ) with 
@@ -228,15 +228,6 @@ type Serde( options: SerdeOptions ) =
                 failwithf "Unable to find serialiser for system type [%O] / content type [%O]" nt contentType
         | false, _ -> 
             failwithf "Unable to find serialiser for system type [%O]" nt     
-
-    member this.Extract (contentType:string) (typeName:string) (s:ISerdeStream) =
-    
-        use msr = 
-            new System.IO.MemoryStream()
-            
-        s.Stream.CopyTo(msr)
-        
-        TypeWrapper.Make( contentType, Some typeName, msr.ToArray() ) 
     
     member this.Deserialise (contentType:string) (typeName:string) (s:ISerdeStream) =
         
@@ -291,12 +282,12 @@ type Serde( options: SerdeOptions ) =
             member this.Items = 
                 this.Items 
 
-            member this.TryLookupByTypeName (contentType:string,typeName:string) = 
-                this.TryLookupByTypeName contentType typeName 
+            member this.TrySerdeByTypeName (contentType:string,typeName:string) = 
+                this.TrySerdeByTypeName contentType typeName 
                 
-            member this.TryLookupBySystemType (contentType:string,localType:System.Type) = 
-                this.TryLookupBySystemType contentType localType 
-                                
+            member this.TrySerdeBySystemType (contentType:string,localType:System.Type) = 
+                this.TrySerdeBySystemType contentType localType 
+
             member this.Serialise contentType serialiserStream v = 
                 this.Serialise contentType serialiserStream v                         
                 

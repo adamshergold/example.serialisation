@@ -16,20 +16,14 @@ with
         }
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Score>
 
 module private Score_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Score>
+        { new ITypeSerde<Score>
             with
                 member this.TypeName =
                     "Example.Score"
-
-                member this.Type
-                    with get () = typeof<Score>
 
                 member this.ContentType
                     with get () = "binary"
@@ -57,13 +51,10 @@ module private Score_Serialisers =
                     Score.Make( mark, pass ) }
                     
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Score>
+        { new ITypeSerde<Score>
             with
                 member this.TypeName =
                     "Example.Score"
-
-                member this.Type
-                    with get () = typeof<Score>
 
                 member this.ContentType
                     with get () = "json"

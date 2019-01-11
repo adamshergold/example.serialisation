@@ -9,20 +9,14 @@ type Status =
     | Married of string 
 with
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Status>
 
 module private Status_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Status>
+        { new ITypeSerde<Status>
             with
                 member this.TypeName =
                     "Example.Status"
-
-                member this.Type
-                    with get () = typeof<Status>
 
                 member this.ContentType
                     with get () = "binary"
@@ -55,13 +49,10 @@ module private Status_Serialisers =
                         failwithf "Unexpected union case seen when deserialising Status: '%s'" v } 
                         
     let JSON_Serialiser =
-        { new ITypeSerialiser<Status>
+        { new ITypeSerde<Status>
             with
                 member this.TypeName =
                     "Example.Status"
-
-                member this.Type
-                    with get () = typeof<Status>
 
                 member this.ContentType
                     with get () = "json"

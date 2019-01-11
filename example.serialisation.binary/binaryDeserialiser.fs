@@ -72,7 +72,7 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
         let inlineTypeName = 
             wrapper.PeekString()
                   
-        match serialiser.TryLookupByTypeName (this.ContentType, inlineTypeName) with
+        match serialiser.TrySerdeByTypeName (this.ContentType, inlineTypeName) with
         | Some serialiser -> 
             inlineTypeName
         | None ->
@@ -84,7 +84,7 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
             match ts with 
             | :? ITypeWrapper as tw ->
                 if tw.TypeName.IsSome then 
-                    match serialiser.TryLookupByTypeName (tw.ContentType,tw.TypeName.Value) with 
+                    match serialiser.TrySerdeByTypeName (tw.ContentType,tw.TypeName.Value) with 
                     | Some typeSerialiser ->
                         use ms = 
                             new System.IO.MemoryStream( tw.Body ) 

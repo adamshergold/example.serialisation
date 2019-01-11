@@ -39,14 +39,17 @@ module Helpers =
                       
     let Wrap (serde:ISerde) (ts:ITypeSerialisable) (contentTypes:seq<string>) = 
     
+        let actualType =
+            ts.GetType()
+            
         let contentType, typeName =
          
             let picker (ct:string) = 
-                serde.TryLookupBySystemType (ct,ts.Type) |> Option.map ( fun serde -> serde, ct )
+                serde.TrySerdeBySystemType (ct,actualType) |> Option.map ( fun serde -> serde, ct )
                  
             match contentTypes |> Seq.tryPick picker with 
             | None -> 
-                failwithf "Unable to find a serialiser for '%O' for any of '%s'" (ts.Type) (contentTypes |> String.concat ",")
+                failwithf "Unable to find a serialiser for '%O' for any of '%s'" actualType (contentTypes |> String.concat ",")
             | Some (ts,contentType) -> 
                 contentType, ts.TypeName
                 

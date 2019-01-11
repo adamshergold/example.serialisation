@@ -10,20 +10,14 @@ with
         new Empty()
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Empty>
 
 module private Empty_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Empty>
+        { new ITypeSerde<Empty>
             with
                 member this.TypeName =
                     "Example.Empty"
-
-                member this.Type
-                    with get () = typeof<Empty>
 
                 member this.ContentType
                     with get () = "binary"
@@ -46,13 +40,10 @@ module private Empty_Serialisers =
                     result }
                     
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Empty>
+        { new ITypeSerde<Empty>
             with
                 member this.TypeName =
                     "Example.Empty"
-
-                member this.Type
-                    with get () = typeof<Empty>
 
                 member this.ContentType
                     with get () = "json"

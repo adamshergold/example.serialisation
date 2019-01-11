@@ -22,24 +22,6 @@ type ExamplesShould( oh: ITestOutputHelper ) =
             
         Logging.CreateLogger options
 
-//    let roundTrip (serde:ISerde) (typeName:string) (v:obj) = 
-//    
-//        use msw = 
-//            new System.IO.MemoryStream()
-//                    
-//        use writeStream = 
-//            SerdeStreamWrapper.Make( msw )            
-//                    
-//        v |> serialiser.Serialise None writeStream
-//
-//        use msr = 
-//            new System.IO.MemoryStream( msw.ToArray() )
-//            
-//        use readStream = 
-//            SerdeStreamWrapper.Make( msr )            
-//        
-//        serialiser.Deserialise None typeName readStream 
-
     let sut = 
     
         let sut = 

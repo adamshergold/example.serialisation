@@ -35,7 +35,7 @@ type BinaryProxyShould( oh: ITestOutputHelper ) =
             
         Assert.Equal( Some "test", sut.Wrapper.TypeName )
         
-        Assert.Equal( typeof<BinaryProxy>, (sut :> ITypeSerialisable).Type )
+        Assert.Equal( typeof<BinaryProxy>, sut.GetType() )
         
 
         

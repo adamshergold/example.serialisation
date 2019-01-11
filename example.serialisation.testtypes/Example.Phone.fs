@@ -16,20 +16,14 @@ with
         }
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Phone>
 
 module private Phone_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Phone>
+        { new ITypeSerde<Phone>
             with
                 member this.TypeName =
                     "Example.Phone"
-
-                member this.Type
-                    with get () = typeof<Phone>
 
                 member this.ContentType
                     with get () = "binary"
@@ -69,13 +63,10 @@ module private Phone_Serialisers =
                     result }
                                                   
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Phone>
+        { new ITypeSerde<Phone>
             with
                 member this.TypeName =
                     "Example.Phone"
-
-                member this.Type
-                    with get () = typeof<Phone>
 
                 member this.ContentType
                     with get () = "json"

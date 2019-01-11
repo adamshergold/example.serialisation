@@ -60,17 +60,25 @@ type SerdeShould( oh: ITestOutputHelper ) =
         Assert.Equal( nItems, sut.Items |> Seq.length )                    
 
     [<Fact>]
-    member this.``TryLookupByTypeName`` () =
+    member this.``TrySerdeBySystemType`` () =
     
-        let sut = 
-            Serde.Make( )
+        let sut =
+            let options = { SerdeOptions.Default with Logger = Some logger }
+            Serde.Make( options )
             
         let nItems =             
             sut.TryRegisterAssembly typeof<Example.Serialisation.TestTypes.Example.Person>.Assembly
             
+        logger.LogInformation( "Registered {Items} items", nItems )
+        
         Assert.True( nItems > 0 )
 
-        Assert.Equal( nItems, sut.Items |> Seq.length )                    
+        Assert.Equal( nItems, sut.Items |> Seq.length )
+        
+        let serialiser =
+            sut.TrySerdeBySystemType ("json",typeof<Example.Serialisation.TestTypes.Example.Person>)
+            
+        Assert.True( serialiser.IsSome )            
                     
           
         

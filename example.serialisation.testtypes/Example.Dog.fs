@@ -23,20 +23,14 @@ with
             member this.NickName = this.NickName
     
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Dog>
 
 module private Dog_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Dog>
+        { new ITypeSerde<Dog>
             with
                 member this.TypeName =
                     "Example.Dog"
-
-                member this.Type
-                    with get () = typeof<Dog>
 
                 member this.ContentType
                     with get () = "binary"
@@ -81,13 +75,10 @@ module private Dog_Serialisers =
                     result }
                     
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Dog>
+        { new ITypeSerde<Dog>
             with
                 member this.TypeName =
                     "Example.Dog"
-
-                member this.Type
-                    with get () = typeof<Dog>
 
                 member this.ContentType
                     with get () = "json"

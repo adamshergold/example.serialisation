@@ -28,20 +28,15 @@ with
         }
 
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<Person>
+
 
 module private Person_Serialisers = 
 
     let Binary_Serialiser = 
-        { new ITypeSerialiser<Person>
+        { new ITypeSerde<Person>
             with
                 member this.TypeName =
                     "Example.Person"
-
-                member this.Type
-                    with get () = typeof<Person>
 
                 member this.ContentType
                     with get () = "binary"
@@ -117,13 +112,10 @@ module private Person_Serialisers =
                     Person.Make( name, address, phone, scores, pets, ethnicity, status, hobbies ) }                                                            
                     
     let JSON_Serialiser = 
-        { new ITypeSerialiser<Person>
+        { new ITypeSerde<Person>
             with
                 member this.TypeName =
                     "Example.Person"
-
-                member this.Type
-                    with get () = typeof<Person>
 
                 member this.ContentType
                     with get () = "json"

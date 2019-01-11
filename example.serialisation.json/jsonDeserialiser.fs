@@ -66,7 +66,7 @@ type JsonDeserialiser( serde: ISerde, stream: ISerdeStream, contentType : string
                 let inlineTypeName =
                     unbox<string>(reader.PeekAt(2).Value)
                     
-                match serde.TryLookupByTypeName (contentType,inlineTypeName) with 
+                match serde.TrySerdeByTypeName (contentType,inlineTypeName) with 
                 | Some _ ->
                     Some inlineTypeName
                 | None ->

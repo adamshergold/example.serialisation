@@ -19,6 +19,6 @@ type TypeWrapperShould( oh: ITestOutputHelper ) =
             
         Assert.True( tw.ToString().Length > 0 )
         
-        Assert.Equal( typeof<TypeWrapper>, (tw :> ITypeSerialisable).Type )
+        Assert.Equal( typeof<TypeWrapper>, tw.GetType() )
                                 
                             

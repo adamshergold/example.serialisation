@@ -7,13 +7,10 @@ open Example.Serialisation
 module Serialisers =
     
     let AnyJsonSerialiser = 
-            { new ITypeSerialiser<Any> 
+            { new ITypeSerde<Any> 
                 with 
                     member this.TypeName =
                         "Any"
-
-                    member this.Type 
-                        with get () = typeof<Any>
     
                     member this.ContentType 
                         with get () = "json" 

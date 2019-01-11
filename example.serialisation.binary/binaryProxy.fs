@@ -12,19 +12,19 @@ type BinaryProxy( wrapper: ITypeWrapper ) =
         new BinaryProxy( wrapper ) 
         
     interface ITypeSerialisable
-        with
-            member this.Type
-                with get () = typeof<BinaryProxy> 
+//        with
+//            member this.Type
+//                with get () = typeof<BinaryProxy> 
         
     static member BinarySerialiser 
         with get () =   
-            { new ITypeSerialiser<BinaryProxy> 
+            { new ITypeSerde<BinaryProxy> 
                 with 
                     member this.TypeName =
                         BinaryProxy.TypeName
 
-                    member this.Type 
-                        with get () = typeof<BinaryProxy> 
+//                    member this.Type 
+//                        with get () = typeof<BinaryProxy> 
                         
                     member this.ContentType = 
                         "binary" 

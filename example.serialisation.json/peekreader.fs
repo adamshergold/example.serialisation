@@ -42,9 +42,9 @@ with
             member this.Dispose () = 
                 this.Dispose() 
                 
-    member this.IsEnd () =
-        check()
-        items.Count = 0 
+//    member this.IsEnd () =
+//        check()
+//        items.Count = 0 
         
     member this.Peek () = 
         check()

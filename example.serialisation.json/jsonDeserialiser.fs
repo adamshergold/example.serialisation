@@ -26,6 +26,7 @@ type JsonDeserialiser( serde: ISerde, stream: ISerdeStream, contentType : string
     member this.Dispose () = 
         wrapper.Dispose()
         handlers.Dispose()
+        reader.Dispose()
 
     member this.ReadString () = 
         System.Convert.ToString( reader.Read().Value ) :> obj

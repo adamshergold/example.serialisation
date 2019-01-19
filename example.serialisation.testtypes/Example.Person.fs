@@ -85,7 +85,7 @@ module private Person_Serialisers =
                         bds.ReadRecord<_>()
                         
                     let phone = 
-                        if bds.ReadBool() then 
+                        if bds.ReadBoolean() then 
                             Some( bds.ReadRecord<Example.Serialisation.TestTypes.Example.Phone>() ) 
                         else 
                             None 
@@ -94,7 +94,7 @@ module private Person_Serialisers =
                         bds.ReadMap<Example.Serialisation.TestTypes.Example.Score>( fun () -> bds.ReadRecord<_>() )
                         
                     let pets =
-                        if bds.ReadBool() then  
+                        if bds.ReadBoolean() then  
                             let v = bds.ReadArray<Example.Serialisation.TestTypes.Example.IPet>( fun () -> bds.ReadInterface<_>() )
                             Some v 
                         else

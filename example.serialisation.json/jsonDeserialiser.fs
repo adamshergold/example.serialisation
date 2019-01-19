@@ -42,7 +42,10 @@ type JsonDeserialiser( serde: ISerde, stream: ISerdeStream, contentType : string
          
     member this.ReadBool () = 
         System.Convert.ToBoolean( reader.Read().Value ) :> obj
-                     
+
+    member this.ReadBoolean () = 
+        System.Convert.ToBoolean( reader.Read().Value ) :> obj
+                         
     member this.ReadEnum<'T> () =    
         let strV = reader.Read().Value.ToString()
         try  

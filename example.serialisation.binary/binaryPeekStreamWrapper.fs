@@ -42,7 +42,10 @@ type BinaryPeekStreamWrapper( ss: ISerdeStream ) =
             
     member this.ReadBool () =    
         reader.ReadBoolean() 
-        
+
+    member this.ReadBoolean () =    
+        reader.ReadBoolean() 
+            
     member this.ReadDouble () = 
         reader.ReadDouble() 
                      

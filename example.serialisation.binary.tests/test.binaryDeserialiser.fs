@@ -110,11 +110,15 @@ type BinaryDeserialiserShould( oh: ITestOutputHelper ) =
     member this.``ReadBool`` () = 
         
         use ts =
-            testStream ( fun bw -> bw.Write( false ) )
+            testStream ( fun bw ->
+                bw.Write( false )
+                bw.Write( true )
+                )
             
         use sut = sut ts
 
         Assert.Equal( false, sut.ReadBool() )
+        Assert.Equal( true, sut.ReadBoolean() )
 
     [<Fact>]
     member this.``ReadDouble`` () = 

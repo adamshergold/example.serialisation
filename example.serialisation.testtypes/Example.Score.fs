@@ -46,7 +46,7 @@ module private Score_Serialisers =
                         bds.ReadDouble()
                         
                     let pass = 
-                        bds.ReadBool()
+                        bds.ReadBoolean()
                     
                     Score.Make( mark, pass ) }
                     

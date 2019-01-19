@@ -43,7 +43,10 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
         System.DateTime.FromBinary( wrapper.ReadInt64() ) 
                 
     member this.ReadBool () = 
-        wrapper.ReadBool() 
+        wrapper.ReadBoolean() 
+
+    member this.ReadBoolean () = 
+        wrapper.ReadBoolean() 
                         
     member this.ReadDouble () = 
         wrapper.ReadDouble() 

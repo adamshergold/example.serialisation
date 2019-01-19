@@ -74,7 +74,7 @@ module Serialisers =
                         | 3uy ->
                             Any.Double( bds.ReadDouble() )
                         | 4uy ->
-                            Any.Bool( bds.ReadBool() )
+                            Any.Bool( bds.ReadBoolean() )
                         | 7uy ->
                             Any.Record( bds.ReadSerialisable() )
                         | 8uy ->

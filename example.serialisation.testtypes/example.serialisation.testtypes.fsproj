@@ -20,6 +20,8 @@
     <Compile Include="Example.All.fs" />
     <Compile Include="Example.Score.fs" />
     <Compile Include="Example.Ethnicity.fs" />
+    <Compile Include="Example.Single.fs" />
+    <Compile Include="Example.Married.fs" />
     <Compile Include="Example.Status.fs" />
     <Compile Include="Example.IPet.fs" />
     <Compile Include="Example.Dog.fs" />

@@ -65,8 +65,7 @@ module Extensions =
                     Phone = Some Phone.Examples.[0]
                     Scores = Map.ofSeq [| "Maths", Score.Examples.[0] |]
                     Pets = Some [| Dog.Examples.[0] |]
-                    Ethnicity = Ethnicity.Examples.[0]
-                    Status = Status.Single
+                    Status = Status.Single( new Example.Single() )
                     Hobbies = Set.ofSeq [ Hobby.Fishing ]
                 }
             } |> Array.ofSeq

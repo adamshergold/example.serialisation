@@ -88,7 +88,7 @@ type JsonDeserialiser( serde: ISerde, stream: ISerdeStream, contentType : string
         fun () ->   
             serde.Deserialise contentType "Any" wrapper 
             
-    member this.ReadSerialisable = 
+    member this.ReadITypeSerialisable =          
         fun () ->   
             this.ReadAnyRecord()
                 

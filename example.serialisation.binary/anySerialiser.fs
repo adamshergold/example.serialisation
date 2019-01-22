@@ -76,9 +76,9 @@ module Serialisers =
                         | 4uy ->
                             Any.Bool( bds.ReadBoolean() )
                         | 7uy ->
-                            Any.Record( bds.ReadSerialisable() )
+                            Any.Record( bds.ReadITypeSerialisable() )
                         | 8uy ->
-                            Any.Union( bds.ReadSerialisable() )
+                            Any.Union( bds.ReadITypeSerialisable() )
                         | 9uy ->
                             let n =
                                 bds.ReadInt32()

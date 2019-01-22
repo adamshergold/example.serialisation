@@ -39,7 +39,7 @@ module private All_Serialisers =
                         BinaryDeserialiser.Make( serde, s, this.TypeName )
                     
                     let theSerialisable = 
-                        bds.ReadSerialisable()
+                        bds.ReadITypeSerialisable()
                         
                     All.Make( theSerialisable ) }
         
@@ -71,7 +71,7 @@ module private All_Serialisers =
                     use jds =
                         JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
-                    jds.Handlers.On "TheSerialisable" ( jds.ReadSerialisable )
+                    jds.Handlers.On "TheSerialisable" ( jds.ReadITypeSerialisable )
 
                     jds.Deserialise()
 

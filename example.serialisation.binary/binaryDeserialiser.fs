@@ -81,7 +81,7 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
         | None ->
             BinaryProxy.TypeName
           
-    member this.ReadSerialisable () =
+    member this.ReadITypeSerialisable () =
         match box(this.ReadRecord None) with
         | :? ITypeSerialisable as ts -> 
             match ts with 

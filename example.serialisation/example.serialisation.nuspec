@@ -7,6 +7,7 @@
     <authors>Adam Shergold</authors>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="12.0.1"/>
+      <dependency id="NodaTime" version="2.4.4"/>
       <dependency id="Microsoft.Extensions.Logging" version="2.2.0"/>
     </dependencies>  
   </metadata>

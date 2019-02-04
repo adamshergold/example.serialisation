@@ -1,7 +1,9 @@
 namespace Example.Serialisation.Json
 
 open Example.Serialisation
-open Newtonsoft.Json 
+//open Newtonsoft.Json 
+
+open NodaTime
 
 type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string ) = 
 
@@ -13,7 +15,6 @@ type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string ) 
         
     do
         writer.Formatting <- Newtonsoft.Json.Formatting.Indented
-         
     
     static member Make( serialiser, ss, contentType ) = 
         new JsonSerialiser( serialiser, ss, contentType )
@@ -58,6 +59,12 @@ type JsonSerialiser( serialiser: ISerde, ss: ISerdeStream, contentType:string ) 
                 writer.WriteValue(v)    
             | :? int64 -> 
                 writer.WriteValue(v)
+            | :? LocalDate as v ->
+                writer.WriteValue( Noda.LocalDateToString v )
+            | :? LocalDateTime as v ->
+                writer.WriteValue( Noda.LocalDateTimeToString v )
+            | :? ZonedDateTime as v ->
+                writer.WriteValue( Noda.ZonedDateTimeToString v )
             | :? array<byte> as v -> 
                 writer.WriteValue(System.Text.Encoding.UTF8.GetString(v))                
             | :? System.IConvertible as ic ->

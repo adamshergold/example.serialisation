@@ -42,6 +42,15 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
     member this.ReadDateTime () = 
         System.DateTime.FromBinary( wrapper.ReadInt64() ) 
                 
+    member this.ReadLocalDate () =
+        wrapper.ReadString() |> Noda.LocalDateFromString
+
+    member this.ReadLocalDateTime () =
+        wrapper.ReadString() |> Noda.LocalDateTimeFromString
+
+    member this.ReadZonedDateTime () =
+        wrapper.ReadString() |> Noda.ZonedDateTimeFromString
+                
     member this.ReadBool () = 
         wrapper.ReadBoolean() 
 

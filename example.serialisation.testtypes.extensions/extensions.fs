@@ -102,5 +102,8 @@ module Extensions =
             seq {
                 yield {
                     TheSerialisable = Address.Examples.[0]
+                    TheLocalDate = NodaTime.LocalDate()
+                    TheLocalDateTime = NodaTime.LocalDateTime()
+                    TheZonedDateTime = NodaTime.ZonedDateTime()
                 }
             }          

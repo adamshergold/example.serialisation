@@ -14,6 +14,7 @@
     <Compile Include="serdeStreamWrapper.fs" />
     <Compile Include="helpers.fs" />
     <Compile Include="any.fs" />
+    <Compile Include="noda.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
     </PackageReference>
     <PackageReference Include="FSharp.Core" Version="$(Example-FSharp-Core-Version)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(Example-Microsoft-Extensions-Logging-Version)" />
+    <PackageReference Include="NodaTime" Version="$(Example-NodaTime-Version)" />
   </ItemGroup>
 
  

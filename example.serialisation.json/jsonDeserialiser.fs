@@ -46,6 +46,18 @@ type JsonDeserialiser( serde: ISerde, stream: ISerdeStream, contentType : string
     member this.ReadBoolean () = 
         System.Convert.ToBoolean( reader.Read().Value ) :> obj
                          
+    member this.ReadLocalDate () =
+        let v = reader.Read().Value.ToString()
+        v |> Noda.LocalDateFromString |> box
+
+    member this.ReadLocalDateTime () =
+        let v = reader.Read().Value.ToString()
+        v |> Noda.LocalDateTimeFromString |> box
+
+    member this.ReadZonedDateTime () =
+        let v = reader.Read().Value.ToString()
+        v |> Noda.ZonedDateTimeFromString |> box
+            
     member this.ReadEnum<'T> () =    
         let strV = reader.Read().Value.ToString()
         try  

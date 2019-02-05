@@ -57,7 +57,7 @@ module private Dog_Serialisers =
                         bds.ReadString()
                         
                     let _NickName =
-                        if bds.ReadBool() then 
+                        if bds.ReadBoolean() then 
                             Some( bds.ReadString() ) 
                         else 
                             None

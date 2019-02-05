@@ -16,3 +16,4 @@ module Utilities =
             match items.TryFind sc with
             | Some cmp -> cmp
             | None -> failwithf "Unable to find string comparer for comparison [%O]" sc
+

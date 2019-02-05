@@ -10,19 +10,17 @@ type Person = {
     Phone : Example.Serialisation.TestTypes.Example.Phone option
     Scores : Map<string,Example.Serialisation.TestTypes.Example.Score>
     Pets : Example.Serialisation.TestTypes.Example.IPet[] option
-    Ethnicity : Example.Serialisation.TestTypes.Example.Ethnicity
     Status : Example.Serialisation.TestTypes.Example.Status
     Hobbies : Set<Example.Serialisation.TestTypes.Example.Hobby>
 }
 with
-    static member Make( _Name, _Address, _Phone, _Scores, _Pets, _Ethnicity, _Status, _Hobbies ) =
+    static member Make( _Name, _Address, _Phone, _Scores, _Pets, _Status, _Hobbies ) =
         {
             Name = _Name
             Address = _Address
             Phone = _Phone
             Scores = _Scores
             Pets = _Pets
-            Ethnicity = _Ethnicity
             Status = _Status
             Hobbies = _Hobbies
         }
@@ -65,8 +63,6 @@ module private Person_Serialisers =
                         bs.Write( (int32) v.Pets.Value.Length )
                         v.Pets.Value |> Seq.iter ( fun v -> bs.Write( v ) )
                         
-                    bs.Write( v.Ethnicity )
-                    
                     bs.Write( v.Status ) 
                     
                     bs.Write( (int32) v.Hobbies.Count )
@@ -85,31 +81,28 @@ module private Person_Serialisers =
                         bds.ReadRecord<_>()
                         
                     let phone = 
-                        if bds.ReadBool() then 
-                            Some( bds.ReadRecord<Example.Serialisation.TestTypes.Example.Phone>() ) 
+                        if bds.ReadBoolean() then 
+                            Some( bds.ReadRecord<_>() ) 
                         else 
                             None 
                     
                     let scores =
-                        bds.ReadMap<Example.Serialisation.TestTypes.Example.Score>( fun () -> bds.ReadRecord<_>() )
+                        bds.ReadMap<_>( fun () -> bds.ReadRecord<_>() )
                         
                     let pets =
-                        if bds.ReadBool() then  
-                            let v = bds.ReadArray<Example.Serialisation.TestTypes.Example.IPet>( fun () -> bds.ReadInterface<_>() )
+                        if bds.ReadBoolean() then  
+                            let v = bds.ReadArray<_>( fun () -> bds.ReadInterface<_>() )
                             Some v 
                         else
                             None
                             
-                    let ethnicity = 
-                        bds.ReadUnion<Example.Serialisation.TestTypes.Example.Ethnicity>()
-                        
                     let status = 
-                        bds.ReadUnion<Example.Serialisation.TestTypes.Example.Status>()
+                        bds.ReadUnion<_>()
                         
                     let hobbies = 
-                        bds.ReadSet<Example.Serialisation.TestTypes.Example.Hobby>( fun () -> bds.ReadEnum<_>() )
+                        bds.ReadSet<_>( fun () -> bds.ReadEnum<_>() )
                                                     
-                    Person.Make( name, address, phone, scores, pets, ethnicity, status, hobbies ) }                                                            
+                    Person.Make( name, address, phone, scores, pets, status, hobbies ) }                                                            
                     
     let JSON_Serialiser = 
         { new ITypeSerde<Person>
@@ -154,9 +147,6 @@ module private Person_Serialisers =
                         v.Pets.Value |> Seq.iter js.Serialise
                         js.WriteEndArray()
                     
-                    js.WriteProperty "Ethnicity"
-                    js.Serialise v.Ethnicity
-                    
                     js.WriteProperty "Status"
                     js.Serialise v.Status
                     
@@ -177,7 +167,6 @@ module private Person_Serialisers =
                     jds.Handlers.On "Phone" ( jds.ReadRecord "Example.Phone" )
                     jds.Handlers.On "Scores" ( jds.ReadMap<Example.Serialisation.TestTypes.Example.Score>( jds.ReadRecord "Example.Score" ) )
                     jds.Handlers.On "Pets" ( jds.ReadArray<Example.Serialisation.TestTypes.Example.IPet>( jds.ReadInterface "Example.IPet" ) )
-                    jds.Handlers.On "Ethnicity" ( jds.ReadUnion "Example.Ethnicity" )
                     jds.Handlers.On "Status" ( jds.ReadUnion "Example.Status" )
                     jds.Handlers.On "Hobbies" ( jds.ReadSet<Example.Serialisation.TestTypes.Example.Hobby>( jds.ReadEnum<Example.Serialisation.TestTypes.Example.Hobby> ) )
 
@@ -190,7 +179,6 @@ module private Person_Serialisers =
                             Phone = jds.Handlers.TryItem<_>( "Phone" )
                             Scores = jds.Handlers.TryItem<_>( "Scores" ).Value
                             Pets = jds.Handlers.TryItem<_>( "Pets" )
-                            Ethnicity = jds.Handlers.TryItem<_>( "Ethnicity" ).Value
                             Status = jds.Handlers.TryItem<_>( "Status" ).Value
                             Hobbies = jds.Handlers.TryItem<_>( "Hobbies" ).Value
                         }

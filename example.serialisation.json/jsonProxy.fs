@@ -83,7 +83,7 @@ with
                             bds.ReadString()  
                             
                         let typeName = 
-                            if bds.ReadBool() then Some( bds.ReadString() ) else None 
+                            if bds.ReadBoolean() then Some( bds.ReadString() ) else None 
                             
                         let body = 
                             bds.ReadBytes( bds.ReadInt32() )

@@ -136,6 +136,9 @@ type ExamplesShould( oh: ITestOutputHelper ) =
           
         logger.LogInformation( "{ContentType} nBytes {Bytes}", contentType, bytes.Length )
                     
+        if contentType = "json" then
+            logger.LogInformation( "{JSON}", System.Text.Encoding.UTF8.GetString bytes )
+            
         let rt = 
             Helpers.Deserialise sut contentType typeName bytes 
                     

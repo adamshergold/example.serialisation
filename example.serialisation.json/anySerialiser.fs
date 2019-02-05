@@ -105,7 +105,7 @@ module Serialisers =
                             | "double" ->
                                 Any.Double( jds.ReadDouble() :?> double )
                             | "bool" ->
-                                Any.Bool( jds.ReadBool() :?> bool )
+                                Any.Bool( jds.ReadBoolean() :?> bool )
                             | "record" ->
                                 let v = jds.ReadAnyRecord()
                                 Any.Record( v :?> ITypeSerialisable )

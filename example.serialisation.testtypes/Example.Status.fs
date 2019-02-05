@@ -5,8 +5,8 @@ open Example.Serialisation.Binary
 open Example.Serialisation.Json
 
 type Status = 
-    | Single 
-    | Married of string 
+    | Single of Single
+    | Married of Married
 with
     interface ITypeSerialisable
 
@@ -27,8 +27,10 @@ module private Status_Serialisers =
                         BinarySerialiser.Make( serde,  stream, this.TypeName )
                     
                     match v with 
-                    | Single -> 
+                    | Single(v) -> 
                         bs.Write( "Single" )
+                        bs.Write( v )
+                        
                     | Married(v) ->
                         bs.Write( "Married" )
                         bs.Write(v)
@@ -40,11 +42,19 @@ module private Status_Serialisers =
 
                     match bds.ReadString() with
                     | _ as v when v = "Single" ->
-                        Status.Single 
+                        
+                        let _Status =
+                            bds.ReadRecord<_>()
+                            
+                        Status.Single( _Status )
+                        
                     | _ as v when v = "Married" ->
-                        let v =
-                            bds.ReadString()
-                        Status.Married(v)
+                        
+                        let _Married =
+                            bds.ReadRecord<_>()
+                            
+                        Status.Married( _Married )
+                        
                     | _ as v ->
                         failwithf "Unexpected union case seen when deserialising Status: '%s'" v } 
                         
@@ -67,9 +77,9 @@ module private Status_Serialisers =
                     js.WriteValue this.TypeName
 
                     match v with
-                    | Single ->
+                    | Single(v) ->
                         js.WriteProperty "Single"
-                        js.WriteNull()
+                        js.Serialise v
                     | Married(v) ->
                         js.WriteProperty "Married"
                         js.Serialise v
@@ -81,18 +91,18 @@ module private Status_Serialisers =
                     use jds =
                         JsonDeserialiser.Make( serde, stream, this.ContentType, this.TypeName )
 
-                    jds.Handlers.On "Single" ( jds.ReadNull )
-                    jds.Handlers.On "Married" ( jds.ReadString )
+                    jds.Handlers.On "Single" ( jds.ReadRecord "Example.Single" )
+                    jds.Handlers.On "Married" ( jds.ReadRecord "Example.Married" )
 
                     jds.Deserialise()
 
                     let result =
                         if jds.Handlers.Has "Single" then
-                            Status.Single
+                            Status.Single( jds.Handlers.TryItem<_>( "Single" ).Value )
                         else if jds.Handlers.Has "Married" then
                             Status.Married( jds.Handlers.TryItem<_>( "Married" ).Value )
-                            else
-                                failwithf "Unable to determine union case when deserialising [%s]" this.TypeName
+                        else
+                            failwithf "Unable to determine union case when deserialising [%s]" this.TypeName
 
                     result }
 

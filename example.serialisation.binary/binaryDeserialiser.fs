@@ -42,8 +42,20 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
     member this.ReadDateTime () = 
         System.DateTime.FromBinary( wrapper.ReadInt64() ) 
                 
+    member this.ReadLocalDate () =
+        wrapper.ReadString() |> Noda.LocalDateFromString
+
+    member this.ReadLocalDateTime () =
+        wrapper.ReadString() |> Noda.LocalDateTimeFromString
+
+    member this.ReadZonedDateTime () =
+        wrapper.ReadString() |> Noda.ZonedDateTimeFromString
+                
     member this.ReadBool () = 
-        wrapper.ReadBool() 
+        wrapper.ReadBoolean() 
+
+    member this.ReadBoolean () = 
+        wrapper.ReadBoolean() 
                         
     member this.ReadDouble () = 
         wrapper.ReadDouble() 
@@ -78,7 +90,7 @@ type BinaryDeserialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string 
         | None ->
             BinaryProxy.TypeName
           
-    member this.ReadSerialisable () =
+    member this.ReadITypeSerialisable () =
         match box(this.ReadRecord None) with
         | :? ITypeSerialisable as ts -> 
             match ts with 

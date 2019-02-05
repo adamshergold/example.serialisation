@@ -28,8 +28,6 @@ type UtilitiesShould( oh: ITestOutputHelper ) =
         Assert.Throws<System.Exception>( fun _ -> Utilities.LookupStringComparer StringComparison.InvariantCultureIgnoreCase |> ignore )
             
     
-
-
-
+    
 
 

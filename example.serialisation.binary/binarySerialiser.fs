@@ -1,6 +1,6 @@
 namespace Example.Serialisation.Binary
 
-open Microsoft.Extensions.Logging
+open NodaTime
 
 open Example.Serialisation
 
@@ -25,7 +25,9 @@ type BinarySerialiser( serialiser: ISerde, ss: ISerdeStream, typeName: string ) 
         | :? int64 as v -> bw.Write(v)
         | :? bool as v -> bw.Write(v)
         | :? double as v -> bw.Write(v)
-        | :? System.DateTime as v -> bw.Write(v.ToBinary())
+        | :? LocalDate as v -> bw.Write( Noda.LocalDateToString v )
+        | :? LocalDateTime as v -> bw.Write( Noda.LocalDateTimeToString v )
+        | :? ZonedDateTime as v -> bw.Write( Noda.ZonedDateTimeToString v )
         | :? ITypeSerialisable as v -> serialiser.Serialise "binary" streamWrapper v
         | :? System.IConvertible as v -> bw.Write(v.ToString())
         | :? array<byte>  as v -> bw.Write(v)

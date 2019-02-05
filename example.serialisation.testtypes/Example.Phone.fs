@@ -46,7 +46,7 @@ module private Phone_Serialisers =
                         BinaryDeserialiser.Make( serde, stream, this.TypeName )
 
                     let _Code = 
-                        if bds.ReadBool() then 
+                        if bds.ReadBoolean() then 
                             Some( bds.ReadString() ) 
                         else 
                             None

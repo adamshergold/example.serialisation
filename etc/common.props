@@ -21,6 +21,8 @@
         <Example-xunit-runner-visualstudio-Version>2.4.0</Example-xunit-runner-visualstudio-Version>
         <Example-Foq-Version>1.8.0</Example-Foq-Version>
 
+        <Example-NodaTime-Version>2.4.4</Example-NodaTime-Version>
+
     </PropertyGroup>
     
 </Project>

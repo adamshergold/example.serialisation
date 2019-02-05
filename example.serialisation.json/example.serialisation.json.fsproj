@@ -27,6 +27,7 @@
     <PackageReference Include="FSharp.Core" Version="$(Example-FSharp-Core-Version)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(Example-Microsoft-Extensions-Logging-Version)" />
     <PackageReference Include="Newtonsoft.Json" Version="$(Example-Newtonsoft-Json-Version)" />
+    <PackageReference Include="NodaTime" Version="$(Example-NodaTime-Version)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -18,6 +18,7 @@
     <Compile Include="test.any.fs" />
     <Compile Include="test.benchmark.fs" />
     <Compile Include="test.examples.fs" />
+    <Compile Include="test.noda.fs" />
   </ItemGroup>
     
   <ItemGroup>
